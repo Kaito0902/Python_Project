@@ -43,7 +43,7 @@ frame = ctk.CTkFrame(window, fg_color="white")
 frame.pack(fill="both", expand=True)
 
 # Ảnh login
-image = Image.open("resources/images/login.jpg")
+image = Image.open(r"C:\Users\ACER\PycharmProjects\Python_project\resources\images\login.jpg")
 image = image.resize((290, 400))  
 photo = ImageTk.PhotoImage(image)
 

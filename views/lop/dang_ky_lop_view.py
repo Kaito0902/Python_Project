@@ -2,7 +2,7 @@ import customtkinter as ctk
 import tkinter.messagebox as msg
 from controllers import lop_controller
 
-class DangKyLopView(ctk.CTkToplevel):
+class DangKyLop(ctk.CTkToplevel):
     def __init__(self, parent=None):
         super().__init__()
         self.title("Đăng ký lớp học cho sinh viên")
