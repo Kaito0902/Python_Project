@@ -23,6 +23,11 @@ class SinhVienModels:
         like_kw = f"%{keyword}%"
         return self.db.execute_query(query, (like_kw, like_kw, like_kw, like_kw, like_kw))
 
+    def get_by_mssv(self, mssv):
+        query = "SELECT * FROM sinh_vien WHERE mssv = %s"
+        result = self.db.execute_query(query, (mssv,))
+        return result[0] if result else None
+
     def insert(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
         query = """
         INSERT INTO sinh_vien (mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email, trang_thai)
@@ -41,3 +46,12 @@ class SinhVienModels:
     def delete(self, mssv):
         query = "UPDATE sinh_vien SET trang_thai = 0 WHERE mssv = %s"
         return self.db.execute_commit(query, (mssv,))
+
+    def restore(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
+        query = """
+        UPDATE sinh_vien
+        SET ho_ten = %s, lop = %s, khoa = %s, ngay_sinh = %s, gioi_tinh = %s,
+            que = %s, email = %s, trang_thai = 1
+        WHERE mssv = %s
+        """
+        return self.db.execute_commit(query, (ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email, mssv))

@@ -10,14 +10,22 @@ class SinhVienController:
         except Exception as e:
             print(f"Lỗi khi lấy danh sách sinh viên: {e}")
             return []
-
+        
     def add_student_db(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
         try:
-            return self.model.insert(mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email)
+            existing_sv = self.model.get_by_mssv(mssv)
+            if existing_sv:
+                if existing_sv['trang_thai'] == 0:
+                    return self.model.restore(mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email)
+                else:
+                    print("Sinh viên đã tồn tại và đang hoạt động.")
+                    return False
+            else:
+                return self.model.insert(mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email)
         except Exception as e:
             print(f"Lỗi khi thêm sinh viên: {e}")
             return False
-
+        
     def update_student_db(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
         try:
             return self.model.update(mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email)
@@ -38,3 +46,4 @@ class SinhVienController:
         except Exception as e:
             print(f"Lỗi khi tìm kiếm sinh viên: {e}")
             return []
+
