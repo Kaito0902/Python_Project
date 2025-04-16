@@ -121,7 +121,7 @@ class LopView(ctk.CTk):
         menu_frame.pack(side="left", fill="y")
 
         # Logo
-        image = Image.open(r"C:\Users\ACER\PycharmProjects\Python_project\resources\images\avatar.png").resize((80, 80))
+        image = Image.open(r"resources\images\avatar.png").resize((80, 80))
         photo = ctk.CTkImage(light_image=image, size=(80, 80))
         img_label = ctk.CTkLabel(menu_frame, image=photo, text="", fg_color="#ffffff")
         img_label.grid(row=0, column=0, pady=5)

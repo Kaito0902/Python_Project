@@ -11,37 +11,47 @@ class MonHocFrame(ctk.CTkFrame):
         super().__init__(parent, corner_radius=15, fg_color="white")
         self.controller = MonHocController()
         self.parent = parent
-        self.pack(pady=20, padx=20, fill="both", expand=True)
+        self.pack(fill="both", expand=True)
         self.create_widgets()
         self.load_data()
 
     def create_widgets(self):
-        ctk.CTkLabel(self, text="QUẢN LÝ MÔN HỌC", font=("Arial", 18, "bold")).pack(pady=10)
+        header_frame = ctk.CTkFrame(self, fg_color="#646765", height=100)
+        header_frame.pack(fill="x")
 
+        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Môn Học", font=("Verdana", 18, "bold"), text_color="#ffffff")
+        label_title.pack(pady=20)
+        
         search_frame = ctk.CTkFrame(self, fg_color="white")
         search_frame.pack(pady=5, padx=20, fill="x")
 
         self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
-        self.search_entry.pack(side="left", padx=10)
+        self.search_entry.pack(side="left", padx=10, pady=20)
         self.search_entry.bind("<KeyRelease>", self.tim_kiem_mon_hoc)
 
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
 
-        ctk.CTkButton(btn_frame, fg_color="green", text="Thêm", text_color="white", command=self.them_mon_hoc, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="orange", text="Sửa", text_color="white", command=self.sua_mon_hoc, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="red", text="Xóa",  text_color="white", command=self.xoa_mon_hoc, width=80).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", font=("Verdana", 13, "bold"), command=self.them_mon_hoc, width=80).pack(side="left", padx=5, pady=20)
+        ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", font=("Verdana", 13, "bold"), command=self.sua_mon_hoc, width=80).pack(side="left", padx=5, pady=20)
+        ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa",  text_color="white", font=("Verdana", 13, "bold"), command=self.xoa_mon_hoc, width=80).pack(side="left", padx=5, pady=20)
 
         style = ttk.Style()
-        style.configure("Treeview", rowheight=25, borderwidth=1, relief="solid", font=("Arial", 14))
-        style.configure("Treeview.Heading", font=("Arial", 12, "bold"))
+        style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
+        style.configure("Treeview.Heading", font=("Arial", 12, "bold"), background="#3084ee", foreground="black")
+        style.map("Treeview", background=[("selected", "#4CAF50")], foreground=[("selected", "white")])
 
         columns = ("Mã Môn", "Tên Môn", "Số Tín Chỉ", "Khoa")
         self.tree = ttk.Treeview(self, columns=columns, show="headings", style="Treeview")
 
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center")
+
+        self.tree.column("Mã Môn", width=80, anchor="center")
+        self.tree.column("Tên Môn", width=180, anchor="center")
+        self.tree.column("Số Tín Chỉ", width=60, anchor="center")
+        self.tree.column("Khoa", width=120, anchor="center")
+
 
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
         self.tree.bind("<ButtonRelease-1>", self.on_row_click)

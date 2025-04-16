@@ -11,38 +11,47 @@ class GiangVienFrame(ctk.CTkFrame):
         super().__init__(parent, corner_radius=15, fg_color="white")
         self.controller = GiangVienController()
         self.parent = parent
-        self.pack(pady=20, padx=20, fill="both", expand=True)
+        self.pack(fill="both", expand=True)
         self.create_widgets()
         self.load_data()
 
     def create_widgets(self):
+        header_frame = ctk.CTkFrame(self, fg_color="#646765", height=100)
+        header_frame.pack(fill="x")
 
-        ctk.CTkLabel(self, text="QUẢN LÝ GIẢNG VIÊN", font=("Arial", 18, "bold")).pack(pady=10)
+        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Giảng Viên", font=("Verdana", 18, "bold"), text_color="#ffffff")
+        label_title.pack(pady=20)
 
         search_frame = ctk.CTkFrame(self, fg_color="white")
         search_frame.pack(pady=5, padx=20, fill="x")
 
         self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
-        self.search_entry.pack(side="left", padx=10)
+        self.search_entry.pack(side="left", padx=10, pady=20)
         self.search_entry.bind("<KeyRelease>", self.tim_kiem_giang_vien)
 
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
 
-        ctk.CTkButton(btn_frame, fg_color="green", text="Thêm", text_color="white", command=self.them_giang_vien, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="orange", text="Sửa", text_color="white", command=self.sua_giang_vien, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="red", text="Xóa",  text_color="white", command=self.xoa_giang_vien, width=80).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", font=("Verdana", 13, "bold"), text_color="white", command=self.them_giang_vien, width=80).pack(side="left", padx=5,pady=20)
+        ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", font=("Verdana", 13, "bold"), text_color="white", command=self.sua_giang_vien, width=80).pack(side="left", padx=5,pady=20)
+        ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", font=("Verdana", 13, "bold"),  text_color="white", command=self.xoa_giang_vien, width=80).pack(side="left", padx=5,pady=20)
 
         style = ttk.Style()
-        style.configure("Treeview", rowheight=25, borderwidth=1, relief="solid", font=("Arial", 14))
-        style.configure("Treeview.Heading", font=("Arial", 12, "bold"))
+        style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
+        style.configure("Treeview.Heading", font=("Arial", 12, "bold"), background="#3084ee", foreground="black")
+        style.map("Treeview", background=[("selected", "#4CAF50")], foreground=[("selected", "white")])
 
         columns = ("Mã GV", "Tên GV", "Khoa", "Email", "SĐT")
         self.tree = ttk.Treeview(self, columns=columns, show="headings", style="Treeview")
 
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, anchor="center")
+            
+        self.tree.column("Mã GV", width=60, anchor="center")
+        self.tree.column("Tên GV", width=120, anchor="center")
+        self.tree.column("Khoa", width=80, anchor="center")
+        self.tree.column("Email", width=120, anchor="center")
+        self.tree.column("SĐT", width=100, anchor="center")
 
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
         self.tree.bind("<ButtonRelease-1>", self.on_row_click)

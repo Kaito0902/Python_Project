@@ -1,3 +1,4 @@
+import re
 import tkinter as ttk
 import customtkinter as ctk
 from datetime import datetime
@@ -13,34 +14,57 @@ class StudentFrame(ctk.CTkFrame):
 
     def add_student(self):
         data = self.get_form_data()
-        if all(data.values()):
-            self.sinh_vien_controller.add_student_db(**data)
+        if not all(data.values()):
+            messagebox.showwarning("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin.")
+            return
+
+        if not self.validate_student_data(data):
+            return
+
+        result = self.sinh_vien_controller.add_student_db(**data)
+        if result:
+            messagebox.showinfo("Thành công", "Thêm sinh viên thành công.")
             self.update_treeview()
             self.clear_entries()
-            messagebox.showinfo("Thành công", "Thêm sinh viên thành công!")
+            self.entry_mssv.configure(state="normal")
         else:
-            messagebox.showwarning("Cảnh báo", "Vui lòng nhập đầy đủ thông tin!")
+            messagebox.showerror("Cảnh cáo", "Mã sinh viên đã tồn tại.")
 
     def delete_student(self):
         selected_item = self.tree.selection()
         if selected_item:
+            confirm = messagebox.askyesno("Xác nhận", "Bạn có chắc chắn muốn xóa sinh viên này?")
+            if not confirm:
+                return
             for item in selected_item:
                 values = self.tree.item(item, 'values')
                 self.sinh_vien_controller.delete_student_db(values[0])
             self.update_treeview()
             self.clear_entries()
         else:
-            messagebox.showwarning("Cảnh báo", "Chọn sinh viên để xóa")
+            messagebox.showwarning("Cảnh báo", "Vui long chọn sinh viên để xóa.")
 
     def update_student(self):
-        selected_item = self.tree.selection()
-        if selected_item:
-            data = self.get_form_data()
-            self.sinh_vien_controller.update_student_db(**data)
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Chọn sinh viên", "Vui lòng chọn sinh viên để cập nhật.")
+            return
+
+        data = self.get_form_data()
+        if not all(data.values()):
+            messagebox.showwarning("Thiếu thông tin", "Vui lòng điền đầy đủ thông tin.")
+            return
+
+        if not self.validate_student_data(data):
+            return
+
+        result = self.sinh_vien_controller.update_student_db(**data)
+        if result:
+            messagebox.showinfo("Thành công", "Cập nhật thông tin thành công.")
             self.update_treeview()
             self.clear_entries()
         else:
-            messagebox.showwarning("Cảnh báo", "Chọn sinh viên để chỉnh sửa")
+            messagebox.showerror("Cảnh cáo", "Cập nhật thất bại.")
 
     def search_student(self):
         query = self.entry_search.get().lower()
@@ -58,6 +82,31 @@ class StudentFrame(ctk.CTkFrame):
             "que": self.entry_hometown.get().strip(),
             "email": self.entry_email.get().strip()
         }
+    
+    def validate_student_data(self, data):
+        if not data["mssv"].isdigit():
+            messagebox.showerror("Cảnh cáo", "Mã sinh viên chỉ được chứa số.")
+            return False
+
+        if not re.match(r"^[a-zA-ZÀ-ỹ\s]+$", data["ho_ten"]):
+            messagebox.showerror("Cảnh cáo", "Họ và tên không hợp lệ!\n Không được chứa số hoặc ký tự đặc biệt.")
+            return False
+
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", data["email"]):
+            messagebox.showerror("Cảnh cáo", "Email không hợp lệ.")
+            return False
+
+        try:
+            birth = datetime.strptime(data["ngay_sinh"], "%Y-%m-%d")
+            age = (datetime.today() - birth).days // 365
+            if age < 18:
+                messagebox.showerror("Cảnh cáo", "Sinh viên phải từ 18 tuổi trở lên.")
+                return False
+        except:
+            messagebox.showerror("Cảnh cáo", "Định dạng ngày sinh không hợp lệ.")
+            return False
+
+        return True
 
     def update_treeview(self, data=None):
         self.tree.delete(*self.tree.get_children())
@@ -77,8 +126,10 @@ class StudentFrame(ctk.CTkFrame):
             values = item["values"]
             if len(values) < 8:
                 return
+            self.entry_mssv.configure(state="normal")
             self.entry_mssv.delete(0, "end")
             self.entry_mssv.insert(0, values[0])
+            self.entry_mssv.configure(state="disabled")
             self.entry_name.delete(0, "end")
             self.entry_name.insert(0, values[1])
             self.entry_class.delete(0, "end")
@@ -102,6 +153,7 @@ class StudentFrame(ctk.CTkFrame):
             self.clear_entries()
 
     def clear_entries(self):
+        self.entry_mssv.configure(state="normal")
         self.entry_mssv.delete(0, ctk.END)
         self.entry_name.delete(0, ctk.END)
         self.entry_class.delete(0, ctk.END)
@@ -123,7 +175,7 @@ class StudentFrame(ctk.CTkFrame):
         header_frame = ctk.CTkFrame(content_frame, fg_color="#646765", height=100)
         header_frame.pack(fill="x")
 
-        label_title = ctk.CTkLabel(header_frame, text="Thông tin sinh viên lớp học", font=("Verdana", 18, "bold"), text_color="#ffffff")
+        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Sinh Viên", font=("Verdana", 18, "bold"), text_color="#ffffff")
         label_title.pack(pady=20)
 
         # Top Form
@@ -152,14 +204,14 @@ class StudentFrame(ctk.CTkFrame):
         label_hometown.grid(row=3, column=3, padx=5, pady=5)
         label_email.grid(row=4, column=3, padx=5, pady=5)
 
-        self.entry_mssv = ctk.CTkEntry(form_frame)
-        self.entry_name = ctk.CTkEntry(form_frame)
-        self.entry_class = ctk.CTkEntry(form_frame)
-        self.entry_faculty = ctk.CTkEntry(form_frame)
-        self.entry_birth = DateEntry(form_frame, date_pattern='yyyy-mm-dd')
+        self.entry_mssv = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_name = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_class = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_faculty = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_birth = DateEntry(form_frame, width=12, background='darkblue', foreground='white', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.combo_gender = ttk.Combobox(form_frame, values=["Nam", "Nữ"], state="readonly", width=12)
-        self.entry_hometown = ctk.CTkEntry(form_frame)
-        self.entry_email = ctk.CTkEntry(form_frame)
+        self.entry_hometown = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_email = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
 
         self.entry_mssv.grid(row=1, column=2, padx=5, pady=5, sticky="w")
         self.entry_name.grid(row=2, column=2, padx=5, pady=5, sticky="w")
@@ -175,17 +227,17 @@ class StudentFrame(ctk.CTkFrame):
         search_frame.pack(side="right", fill="both", expand=True, padx=20, pady=5)
 
         ctk.CTkLabel(search_frame, text="Tìm kiếm", font=("Verdana", 16, "bold")).pack(pady=5)
-        self.entry_search = ctk.CTkEntry(search_frame, width=200)
+        self.entry_search = ctk.CTkEntry(search_frame,placeholder_text="Tìm kiếm...", width=200, height=30, border_width=1, fg_color="white", text_color="black")
         self.entry_search.pack(pady=5)
-        ctk.CTkButton(search_frame, text="Tìm kiếm", command=self.search_student, fg_color="#3084ee", text_color="white").pack(pady=5)
+        ctk.CTkButton(search_frame, text="Tìm kiếm", font=("Verdana", 13, "bold"), command=self.search_student, fg_color="#3084ee", text_color="white").pack(pady=5)
 
         # Nút chức năng
         button_frame = ctk.CTkFrame(content_frame, fg_color="#ffffff")
         button_frame.pack(pady=10)
 
-        ctk.CTkButton(button_frame, text="Thêm", command=self.add_student, fg_color="#4CAF50", text_color="white", width=100).pack(side="left", padx=5)
-        ctk.CTkButton(button_frame, text="Sửa", command=self.update_student, fg_color="#fbbc0e", text_color="white", width=100).pack(side="left", padx=5)
-        ctk.CTkButton(button_frame, text="Xóa", command=self.delete_student, fg_color="#F44336", text_color="white", width=100).pack(side="left", padx=5)
+        ctk.CTkButton(button_frame, text="Thêm", font=("Verdana", 13, "bold"), command=self.add_student, fg_color="#4CAF50", text_color="white", width=100).pack(side="left", padx=5)
+        ctk.CTkButton(button_frame, text="Sửa", font=("Verdana", 13, "bold"), command=self.update_student, fg_color="#fbbc0e", text_color="white", width=100).pack(side="left", padx=5)
+        ctk.CTkButton(button_frame, text="Xóa", font=("Verdana", 13, "bold"), command=self.delete_student, fg_color="#F44336", text_color="white", width=100).pack(side="left", padx=5)
 
         # Treeview
         style = ttk.Style()

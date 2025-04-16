@@ -1,28 +1,37 @@
 import customtkinter as ctk
 from PIL import Image
-from sinh_vien_view import StudentFrame
-from giang_vien.giang_vien_view import GiangVienFrame
-from mon_hoc.mon_hoc_view import MonHocFrame
+from views.sinh_vien_view import StudentFrame
+from views.giang_vien.giang_vien_view import GiangVienFrame
+from views.mon_hoc.mon_hoc_view import MonHocFrame
 
 class MainView(ctk.CTk):
+    def center_window(self, width, height):
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2 - 40 
+        self.geometry(f"{width}x{height}+{x}+{y}")
+
     def __init__(self):
         super().__init__()
         self.title("Trang chủ")
         self.geometry("1024x600")
         self.configure(fg_color="#ffffff")
+        self.center_window(1024, 600)
+
 
         self.init_menu()
         self.init_main_content()
 
     def init_menu(self):
-        self.menu_frame = ctk.CTkFrame(self, fg_color="#3084ee", width=200)
+        self.menu_frame = ctk.CTkFrame(self, fg_color="#3084ee", width=500)
         self.menu_frame.pack(side="left", fill="y")
 
         # Logo
-        image = Image.open(r"C:\Users\ACER\PycharmProjects\Python_project\resources\images\avatar.png").resize((80, 80))
-        photo = ctk.CTkImage(light_image=image, size=(80, 80))
+        image = Image.open(r"resources\images\logo.png").resize((200, 200))
+        photo = ctk.CTkImage(light_image=image, size=(100, 100))
         img_label = ctk.CTkLabel(self.menu_frame, image=photo, text="", fg_color="#ffffff")
-        img_label.grid(row=0, column=0, pady=5)
+        img_label.grid(row=0, column=0, pady=15)
 
         # Nút style
         button_style = {
@@ -34,13 +43,11 @@ class MainView(ctk.CTk):
         }
 
         ctk.CTkButton(self.menu_frame, text="Tài khoản", **button_style).grid(row=1, column=0, pady=5)
-        ctk.CTkButton(self.menu_frame, text="Môn học", **button_style, command=self.show_subject_frame).grid(row=2, column=0, pady=5)
-        ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style).grid(row=3, column=0, pady=5)
-        ctk.CTkButton(self.menu_frame, text="Giảng viên", **button_style, command=self.show_teacher_frame).grid(row=4, column=0,
-                                                                               pady=5)  # ✅ thêm nút này
-        ctk.CTkButton(self.menu_frame, text="Thống kê", **button_style).grid(row=5, column=0, pady=5)
-        ctk.CTkButton(self.menu_frame, text="Sinh viên lớp học", **button_style, command=self.show_student_frame).grid(
-            row=6, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style).grid(row=2, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Môn học", **button_style, command=self.show_subject_frame).grid(row=3, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Giảng viên", **button_style, command=self.show_teacher_frame).grid(row=4, column=0,pady=5) 
+        ctk.CTkButton(self.menu_frame, text="Sinh viên", **button_style, command=self.show_student_frame).grid(row=5, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Thống kê", **button_style).grid(row=6, column=0, pady=5)
 
         logout_btn = ctk.CTkButton(self.menu_frame, text="Đăng xuất", **button_style, command=self.destroy)
         logout_btn.grid(row=7, column=0, pady=5)
