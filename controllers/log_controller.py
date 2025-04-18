@@ -21,6 +21,21 @@ class LogController:
         conn.close()
 
 
+    def get_logs(self):
+        """
+        Lấy danh sách nhật ký từ bảng nhat_ky, sắp xếp theo thời gian giảm dần.
+        Trả về danh sách các dict với các khóa: id, ma_nguoi_dung, hanh_dong, thoi_gian.
+        """
+        conn = self.db.connect()
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT id, ma_nguoi_dung, hanh_dong, thoi_gian FROM nhat_ky ORDER BY thoi_gian "
+        cursor.execute(query)
+        logs = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return logs
+    
+    
     def authenticate(self, username, password):
         # Giả sử bạn đã thực hiện truy vấn và lấy được dữ liệu từ database thành công
         query = "SELECT * FROM tai_khoan WHERE username = %s AND password = %s"
