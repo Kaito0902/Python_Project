@@ -1,13 +1,12 @@
 import tkinter as ttk
 import customtkinter as ctk
 from PIL import Image
-from tkinter import messagebox, ttk
+from tkinter import messagebox
+from tkinter import ttk
 
-from views.lop.them_lop_view import ThemLopHoc
-from views.lop.update_lop_view import UpdateLopHoc
 from controllers.lop_controller import LopController
     
-class LopAdminFrame(ctk.CTkFrame):
+class LopGiangVienFrame(ctk.CTkFrame):
     def __init__(self, master=None, app=None, **kwargs):
         super().__init__(master, **kwargs)
         self.configure(fg_color="#ffffff")
@@ -20,24 +19,21 @@ class LopAdminFrame(ctk.CTkFrame):
         header_frame = ctk.CTkFrame(content_frame, fg_color="#646765", height=100)
         header_frame.pack(fill="x")
 
-        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Lớp Học", font=("Verdana", 18, "bold"), text_color="#ffffff")
+        label_title = ctk.CTkLabel(header_frame, text="Lớp Học Của Tôi", font=("Verdana", 18, "bold"), text_color="#ffffff")
         label_title.pack(pady=20)
 
         search_frame = ctk.CTkFrame(content_frame, fg_color="white")
         search_frame.pack(padx=20, pady=5, fill="x")
-
         self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
         self.search_entry.pack(side="left", padx=10, pady=20)
         
         icon = ctk.CTkImage(Image.open(r"resources\images\search.png").resize((20,20)), size=(20, 20))
-        ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=self.search).pack(side="left", pady=20)
+        btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=None)
+        btn_search.pack(side="left", pady=20)
 
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
 
-        ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", font=("Verdana", 13, "bold"), command=self.add_class, width=80).pack(side="left", padx=5, pady=20)
-        ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", font=("Verdana", 13, "bold"), command=self.update_class, width=80).pack(side="left", padx=5, pady=20)
-        ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa",  text_color="white", font=("Verdana", 13, "bold"), command=self.delete_class, width=80).pack(side="left", padx=5, pady=20)
         ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem chi tiết lớp học⏵",  text_color="white", font=("Verdana", 13, "bold"), command=self.show_detail, width=160).pack(side="left", padx=5, pady=20)
 
         style = ttk.Style()
@@ -77,49 +73,12 @@ class LopAdminFrame(ctk.CTkFrame):
         
         self.tree.pack(fill="both", expand=True)  
         self.update_treeview()
-
+        
         self.tree.bind("<Double-1>", self.deselect)
 
-    def add_class(self):
-        ThemLopHoc(self, self.lop_controller)
-
-    def update_class(self):
-        selected = self.tree.selection()
-        if selected:
-            values = self.tree.item(selected[0], 'values')
-            form = UpdateLopHoc(self, self.lop_controller)
-            form.set_data(*values) 
-        else:
-            messagebox.showwarning("Cảnh báo", "Vui lòng chọn lớp học để cập nhập!")
-
-    def delete_class(self):
-        selected_item = self.tree.selection()
-        if selected_item:
-            confirm = messagebox.askyesno("Xác nhận", "Bạn có chắc chắn muốn xóa lớp học này?")
-            if not confirm:
-                return
-            for item in selected_item:
-                values = self.tree.item(item, 'values')
-                self.lop_controller.delete(values[0])
-            self.update_treeview()
-        else:
-            messagebox.showwarning("Cảnh báo", "Vui lòng chọn lớp học để xóa!")
-
-    def search(self):
-        query = self.search_entry.get().lower()
-        results = self.lop_controller.search_class(query)
-        self.update_treeview(results)
-
     def show_detail(self):
-        selected = self.tree.selection()
-        if selected:
-            values = self.tree.item(selected[0], 'values')
-            ma_lop = values[0] 
-            if self.app:
-                self.app.selected_ma_lop = ma_lop  
-                self.app.show_classAdmin_detail_frame()
-        else:
-            messagebox.showwarning("Cảnh báo", "Vui lòng chọn lớp học để xem chi tiết!")
+        if self.app:
+            self.app.show_classGV_detail_frame()
 
     def update_treeview(self, data=None):
         self.tree.delete(*self.tree.get_children())
@@ -136,3 +95,6 @@ class LopAdminFrame(ctk.CTkFrame):
         selected_item = self.tree.selection()
         if selected_item:
             self.tree.selection_remove(selected_item)
+
+
+

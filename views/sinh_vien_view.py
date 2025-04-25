@@ -1,6 +1,7 @@
 import re
 import tkinter as ttk
 import customtkinter as ctk
+from PIL import Image
 from datetime import datetime
 from tkinter import messagebox
 from tkinter import ttk
@@ -9,9 +10,6 @@ from tkcalendar import DateEntry
 from controllers.sinh_vien_controller import SinhVienController
 
 class StudentFrame(ctk.CTkFrame):
-
-    sinh_vien_controller = SinhVienController()
-
     def add_student(self):
         data = self.get_form_data()
         if not all(data.values()):
@@ -136,10 +134,7 @@ class StudentFrame(ctk.CTkFrame):
             self.entry_class.insert(0, values[2])
             self.entry_faculty.delete(0, "end")
             self.entry_faculty.insert(0, values[3])
-            try:
-                self.entry_birth.set_date(values[4])
-            except:
-                print("Lỗi khi gán ngày sinh!")
+            self.entry_birth.set_date(values[4])
             self.combo_gender.set(values[5])
             self.entry_hometown.delete(0, "end")
             self.entry_hometown.insert(0, values[6])
@@ -166,6 +161,7 @@ class StudentFrame(ctk.CTkFrame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
         self.configure(fg_color="#ffffff")
+        self.sinh_vien_controller = SinhVienController()
 
         # Nội dung chính
         content_frame = ctk.CTkFrame(self, fg_color="#ffffff")
@@ -226,10 +222,12 @@ class StudentFrame(ctk.CTkFrame):
         search_frame = ctk.CTkFrame(top_frame, fg_color="#ffffff")
         search_frame.pack(side="right", fill="both", expand=True, padx=20, pady=5)
 
-        ctk.CTkLabel(search_frame, text="Tìm kiếm", font=("Verdana", 16, "bold")).pack(pady=5)
+        ctk.CTkLabel(search_frame, text="Tìm kiếm", font=("Verdana", 16, "bold")).grid(row=0, column=0, sticky="ew")
         self.entry_search = ctk.CTkEntry(search_frame,placeholder_text="Tìm kiếm...", width=200, height=30, border_width=1, fg_color="white", text_color="black")
-        self.entry_search.pack(pady=5)
-        ctk.CTkButton(search_frame, text="Tìm kiếm", font=("Verdana", 13, "bold"), command=self.search_student, fg_color="#3084ee", text_color="white").pack(pady=5)
+        self.entry_search.grid(row=1, column=0, pady=5)
+
+        icon = ctk.CTkImage(Image.open(r"resources\images\search.png").resize((20,20)), size=(20, 20))
+        ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=self.search_student).grid(row=1, column=1, pady=5)
 
         # Nút chức năng
         button_frame = ctk.CTkFrame(content_frame, fg_color="#ffffff")
