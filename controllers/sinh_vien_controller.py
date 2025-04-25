@@ -1,6 +1,7 @@
 from models.sinh_vien import SinhVienModels
 
 class SinhVienController:
+    
     def __init__(self):
         self.model = SinhVienModels()
 
