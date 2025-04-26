@@ -1,75 +1,48 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from tkinter import messagebox
-from PIL import Image, ImageTk
+from controllers.login_controller import LoginController
 
-ctk.set_appearance_mode("light") 
-ctk.set_default_color_theme("blue") 
+class LoginView(ctk.CTk):
+    def __init__(self):
+        super().__init__()
 
-def login():
-    username = entry_username.get()
-    password = entry_password.get()
-    
-    if username == "admin" and password == "123":
-        window.destroy()
-        import main  
-    elif username == "giaovien" and password == "321":
-        window.destroy()
-        import views.lop.lop_admin_view as lop_admin_view         
-    else:
-        messagebox.showerror("Lỗi", "Sai tài khoản hoặc mật khẩu!")
+        self.title("Đăng nhập")
+        self.geometry("400x300")
 
-def center_window(window, width, height):
-    screen_width = window.winfo_screenwidth()  
-    screen_height = window.winfo_screenheight() 
-    x = (screen_width - width) // 2
-    y = (screen_height - height) // 2
-    window.geometry(f"{width}x{height}+{x}+{y}")  
+        self.controller = LoginController()
 
-def on_enter(e):
-    btn_login.configure(fg_color="#56ec9b")  
+        # Label và Entry Username
+        self.label_username = ctk.CTkLabel(self, text="Tên đăng nhập:")
+        self.label_username.pack(pady=10)
+        self.entry_username = ctk.CTkEntry(self)
+        self.entry_username.pack(pady=5)
 
-def on_leave(e):
-    btn_login.configure(fg_color="#338dfe")  
+        # Label và Entry Password
+        self.label_password = ctk.CTkLabel(self, text="Mật khẩu:")
+        self.label_password.pack(pady=10)
+        self.entry_password = ctk.CTkEntry(self, show="*")
+        self.entry_password.pack(pady=5)
 
-# Tạo cửa sổ 
-window = ctk.CTk()
-window.title("Đăng Nhập")
-window.geometry("600x400")
-window.configure(fg_color="white")
-window.resizable(False, False)
-center_window(window, 600, 400)  
+        # Nút đăng nhập
+        self.button_login = ctk.CTkButton(self, text="Đăng nhập", command=self.dang_nhap)
+        self.button_login.pack(pady=20)
 
-frame = ctk.CTkFrame(window, fg_color="white")
-frame.pack(fill="both", expand=True)
+    def dang_nhap(self):
+        username = self.entry_username.get()
+        password = self.entry_password.get()
 
-# Ảnh login
-image = Image.open(r"C:\Users\ACER\PycharmProjects\Python_project\resources\images\login.jpg")
-image = image.resize((290, 400))  
-photo = ImageTk.PhotoImage(image)
+        user = self.controller.dang_nhap(username, password)
+        
+        if user:
+            messagebox.showinfo("Thành công", f"Đăng nhập thành công! Vai trò: {user['vai_tro']}")
+            self.destroy()  # Đóng cửa sổ đăng nhập
+            # TODO: Mở giao diện chính
+        else:
+            messagebox.showerror("Lỗi", "Sai tên đăng nhập hoặc mật khẩu")
 
-img_label = ctk.CTkLabel(frame, image=photo, text="")
-img_label.grid(row=0, column=0, padx=0, pady=0)
-
-# Form login
-form_frame = ctk.CTkFrame(frame, fg_color="white")
-form_frame.grid(row=0, column=1, padx=20, pady=20)
-
-label_title = ctk.CTkLabel(form_frame, text="LOGIN", font=("Verdana", 18, "bold"), text_color="#0071fe")
-label_title.grid(row=0, column=0, pady=10)
-
-ctk.CTkLabel(form_frame, text="Tên tài khoản", font=("Arial", 14, "bold"), text_color="#515a51").grid(row=1, column=0, sticky="w", padx=10, pady=5)
-entry_username = ctk.CTkEntry(form_frame, font=("Arial", 12), width=250, corner_radius=10)
-entry_username.grid(row=2, column=0, padx=10, pady=5)
-
-ctk.CTkLabel(form_frame, text="Mật khẩu", font=("Arial", 14, "bold"), text_color="#515a51").grid(row=3, column=0, sticky="w", padx=10, pady=5)
-entry_password = ctk.CTkEntry(form_frame, font=("Arial", 12), width=250, show="*", corner_radius=10)
-entry_password.grid(row=4, column=0, padx=10, pady=5)
-
-#Nút đăng nhập
-btn_login = ctk.CTkButton(form_frame, text="Đăng nhập", font=("Arial", 14, "bold"), fg_color="#338dfe", text_color="white", corner_radius=10, command=login)
-btn_login.grid(row=5, column=0, pady=15)
-btn_login.bind("<Enter>", on_enter)
-btn_login.bind("<Leave>", on_leave)
-
-#####
-window.mainloop()
+if __name__ == "__main__":
+    app = LoginView()
+    app.mainloop()
