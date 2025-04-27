@@ -23,3 +23,9 @@ class GiangVienModels:
     def delete(self, ma_gv):
         query = "UPDATE giang_vien SET trang_thai = 0 WHERE ma_gv = %s"
         return self.db.execute_commit(query, (ma_gv,))
+
+    def check_exists(self, ma_gv):
+        query = "SELECT COUNT(*) FROM giang_vien WHERE ma_gv = %s"
+        result = self.db.execute_query(query, (ma_gv,))
+        count = result[0]['COUNT(*)'] if result else 0
+        return count > 0

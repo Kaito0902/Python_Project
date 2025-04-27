@@ -2,11 +2,16 @@ import customtkinter as ctk
 from PIL import Image
 from views.sinh_vien_view import StudentFrame
 from views.giang_vien.giang_vien_view import GiangVienFrame
+from views.khoa.khoa_view import KhoaFrame
 from views.mon_hoc.mon_hoc_view import MonHocFrame
 from views.lop.lop_admin_view import LopAdminFrame
 from views.lop.lop_giangvien_view import LopGiangVienFrame
 from views.lop.chi_tiet_lop_admin_view import ChiTietLopAdminFrame
 from views.lop.chi_tiet_lop_giangvien_view import ChiTietLopGiangVienFrame
+from views.cau_hinh_diem.QuanLyLopTabbedPane import QuanLyLopTabbedPane
+from views.account_view import AccountManager
+from session import current_user
+
 
 class MainView(ctk.CTk):
     def __init__(self):
@@ -25,7 +30,7 @@ class MainView(ctk.CTk):
         self.menu_frame.pack(side="left", fill="y")
 
         # Logo
-        image = Image.open(r"resources\images\logo.png").resize((200, 200))
+        image = Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\logo.png").resize((200, 200))
         photo = ctk.CTkImage(light_image=image, size=(100, 100))
         img_label = ctk.CTkLabel(self.menu_frame, image=photo, text="", fg_color="#ffffff")
         img_label.grid(row=0, column=0, pady=15)
@@ -39,12 +44,14 @@ class MainView(ctk.CTk):
             "height": 40
         }
 
-        ctk.CTkButton(self.menu_frame, text="Tài khoản", **button_style).grid(row=1, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Tài khoản", **button_style, command=self.show_account_frame).grid(row=1, column=0, pady=5)
         ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classAdmin_frame).grid(row=2, column=0, pady=5)
+        # ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
         ctk.CTkButton(self.menu_frame, text="Môn học", **button_style, command=self.show_subject_frame).grid(row=3, column=0, pady=5)
-        ctk.CTkButton(self.menu_frame, text="Giảng viên", **button_style, command=self.show_teacher_frame).grid(row=4, column=0,pady=5) 
+        ctk.CTkButton(self.menu_frame, text="Giảng viên", **button_style, command=self.show_teacher_frame).grid(row=4, column=0, pady=5)
         ctk.CTkButton(self.menu_frame, text="Sinh viên", **button_style, command=self.show_student_frame).grid(row=5, column=0, pady=5)
-        ctk.CTkButton(self.menu_frame, text="Thống kê", **button_style).grid(row=6, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Khoa", **button_style, command=self.show_khoa_frame).grid(row=6, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Thống kê", **button_style).grid(row=7, column=0, pady=5)
 
         logout_btn = ctk.CTkButton(self.menu_frame, text="Đăng xuất", **button_style, command=self.destroy)
         logout_btn.grid(row=7, column=0, pady=5)
@@ -63,8 +70,19 @@ class MainView(ctk.CTk):
         self.main_content = ctk.CTkFrame(self, fg_color="#ffffff")
         self.main_content.pack(side="right", fill="both", expand=True)
 
+    def show_account_frame(self):
+        for widget in self.main_content.winfo_children():
+            widget.destroy()
+        account_frame = AccountManager(self.main_content)
+        account_frame.pack(fill="both", expand=True)
+
+    def show_khoa_frame(self):
+        for widget in self.main_content.winfo_children():
+            widget.destroy()
+        khoa_frame = KhoaFrame(self.main_content)
+        khoa_frame.pack(fill="both", expand=True)
+
     def show_student_frame(self):
-        # Xóa nội dung hiện tại (nếu có)
         for widget in self.main_content.winfo_children():
             widget.destroy()
 
@@ -114,6 +132,13 @@ class MainView(ctk.CTk):
         chi_tiet_GV_frame = ChiTietLopGiangVienFrame(self.main_content, app=self)
         chi_tiet_GV_frame.pack(fill="both", expand=True)
 
+    def show_diemlop_frame(self):
+        for widget in self.main_content.winfo_children():
+            widget.destroy()
+        bang_diem_lop_frame = QuanLyLopTabbedPane(self.main_content)
+        bang_diem_lop_frame.pack(fill="both", expand=True)
+
 if __name__ == "__main__":
+    current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro_id": "admin"})
     app = MainView()
     app.mainloop()

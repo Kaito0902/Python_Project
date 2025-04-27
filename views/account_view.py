@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import customtkinter as ctk
 from customtkinter import CTkComboBox
 from tkinter import ttk, messagebox
-import mysql.connector
+from PIL import Image
 import tkinter as tk
 from tkinter import Toplevel, Label, Entry, Button, messagebox
 from tkinter import simpledialog
@@ -18,16 +18,14 @@ from controllers.log_controller import LogController
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
-class AccountManager(ctk.CTkToplevel):
+
+class AccountManager(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent, corner_radius=15, fg_color="white")
         self.controller = AccountController()
         self.log_controller = LogController()
-        self.title("Quản lý Tài Khoản")
-        self.geometry("900x500")
-        self.configure(bg="#f5f5f5")
-        self.attributes('-topmost', True)
-
+        self.parent = parent
+        self.pack(fill="both", expand=True)
         self.db = Database()
         self.all_accounts = []
 
@@ -35,33 +33,44 @@ class AccountManager(ctk.CTkToplevel):
         self.load_data()
 
     def create_widgets(self):
-        main_frame = ctk.CTkFrame(self, corner_radius=15, fg_color="white")
-        main_frame.pack(pady=20, padx=20, fill="both", expand=True)
 
-        ctk.CTkLabel(main_frame, text="QUẢN LÝ TÀI KHOẢN", font=("Arial", 18, "bold")).pack(pady=10)
+        header_frame = ctk.CTkFrame(self, fg_color="#646765", height=100)
+        header_frame.pack(fill="x")
 
-        search_frame = ctk.CTkFrame(main_frame, fg_color="white")
+        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Tài Khoản", font=("Verdana", 18, "bold"),
+                                   text_color="#ffffff")
+        label_title.pack(pady=20)
+
+        search_frame = ctk.CTkFrame(self, fg_color="white")
         search_frame.pack(pady=5, padx=20, fill="x")
 
         self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=200)
         self.search_entry.pack(side="left", padx=10)
         self.search_entry.bind("<KeyRelease>", self.search_user)
+
+        icon = ctk.CTkImage(
+            Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize(
+                (20, 20)), size=(20, 20))
+        btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
+                                   hover_color="#ffffff", command=None)
+        btn_search.pack(side="left", pady=20)
         
 
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
 
-        ctk.CTkButton(btn_frame, text="Thêm", command=self.add_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="Sửa", command=self.edit_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="Xóa", command=self.delete_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, text="Xem nhật ký", command=self.view_logs, width=80).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", command=self.add_user, width=80).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", command=self.edit_user, width=80).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", text_color="white", command=self.delete_user, width=80).pack(side="left", padx=5)
+        ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", command=self.view_logs, width=80).pack(side="left", padx=5)
 
         style = ttk.Style()
-        style.configure("Treeview", rowheight=25, borderwidth=1, relief="solid", font=("Arial", 14))
-        style.configure("Treeview.Heading", font=("Arial", 12, "bold"))
+        style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
+        style.configure("Treeview.Heading", font=("Arial", 12, "bold"), background="#3084ee", foreground="black")
+        style.map("Treeview", background=[("selected", "#4CAF50")], foreground=[("selected", "white")])
 
         columns = ("Mã Người Dùng", "Username", "Password", "Vai trò")
-        self.tree = ttk.Treeview(main_frame, columns=columns, show="headings", style="Treeview")
+        self.tree = ttk.Treeview(self, columns=columns, show="headings", style="Treeview")
 
         for col in columns:
             self.tree.heading(col, text=col)
@@ -344,7 +353,7 @@ class AccountManager(ctk.CTkToplevel):
         h_scroll.config(command=tv.xview)
 
         # Đổ dữ liệu
-        logs = self.log_controller.get_logs()
+        logs = self.log_controller.lay_nhat_ky()
         for log in logs:
             tv.insert("", "end", values=(
                 log["id"], log["ma_nguoi_dung"], log["hanh_dong"], log["thoi_gian"]
@@ -391,11 +400,11 @@ def validate_user_update(username, password, vai_tro, parent_window):
         return False
     return True
 
-
-if __name__ == "__main__":
-     # Giả sử người dùng đã đăng nhập với vai trò admin
-    current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro_id": "admin"})
-    root = ctk.CTk()  
-    root.withdraw()  
-    app = AccountManager(root)  
-    app.mainloop()
+#
+# if __name__ == "__main__":
+#      # Giả sử người dùng đã đăng nhập với vai trò admin
+#     current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro_id": "admin"})
+#     root = ctk.CTk()
+#     root.withdraw()
+#     app = AccountManager(root)
+#     app.mainloop()

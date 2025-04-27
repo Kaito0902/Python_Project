@@ -1,21 +1,29 @@
-import mysql.connector
-from models.database import Database
+from models.login_models import LoginModels
+from session import current_user
 
 class LoginController:
     def __init__(self):
-        self.db = Database()
+        self.login_model = LoginModels()
 
     def dang_nhap(self, username, password):
-        conn = self.db.connect()
-        cursor = conn.cursor(dictionary=True)
-        
-        query = "SELECT * FROM tai_khoan WHERE username = %s AND password = %s"
-        cursor.execute(query, (username, password))
-        user = cursor.fetchone()
-        
-        cursor.close()
-        conn.close()
-
+        """
+        Thực hiện đăng nhập.
+        Nếu thành công, lưu thông tin vào current_user.
+        Trả về True nếu thành công, False nếu thất bại.
+        """
+        user = self.login_model.dang_nhap(username, password)
         if user:
-            return user  # Trả về thông tin tài khoản nếu đăng nhập thành công
-        return None  # Sai tài khoản hoặc mật khẩu
+            current_user.clear()
+            current_user.update({
+                "ma_nguoi_dung": user["ma_nguoi_dung"],
+                "username": user["username"],
+                "vai_tro_id": user["vai_tro"]
+            })
+            return True
+        return False
+
+    def dang_xuat(self):
+        """
+        Đăng xuất người dùng hiện tại (xóa current_user).
+        """
+        current_user.clear()

@@ -10,7 +10,6 @@ class QuanLyLopTabbedPane(ctk.CTkFrame):
         self.create_widgets()
 
     def create_widgets(self):
-        ctk.CTkLabel(self, text="QUẢN LÝ LỚP HỌC", font=("Arial", 20, "bold"), fg_color="white").pack(pady=10)
 
         notebook = ttk.Notebook(self)
         notebook.pack(fill="both", expand=True)

@@ -1,21 +1,13 @@
-from models.database import Database
+from models.permission_models import PermissionModels
 
 class PermissionController:
     def __init__(self):
-        self.db = Database()
+        self.permission_model = PermissionModels()
 
-    def get_permissions_for_role(self, vai_tro_id):
+    def lay_quyen_theo_vai_tro(self, vai_tro_id):
         """
-        Lấy danh sách quyền (quyen_id) dành cho vai trò có id = vai_tro_id.
-        :param vai_tro_id: id của vai trò trong bảng vai_tro.
-        :return: Danh sách các giá trị quyen_id.
+        Lấy danh sách quyền theo vai trò.
+        :param vai_tro_id: ID vai trò.
+        :return: Danh sách quyen_id.
         """
-        conn = self.db.connect()
-        cursor = conn.cursor(dictionary=True)
-        query = "SELECT quyen_id FROM phan_quyen WHERE vai_tro_id = %s"
-        cursor.execute(query, (vai_tro_id,))
-        rows = cursor.fetchall()
-        permissions = [row['quyen_id'] for row in rows]
-        cursor.close()
-        conn.close()
-        return permissions
+        return self.permission_model.get_permissions_for_role(vai_tro_id)

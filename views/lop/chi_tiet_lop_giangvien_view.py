@@ -99,3 +99,4 @@ class ChiTietLopGiangVienFrame(ctk.CTkFrame):
         selected_item = self.tree.selection()
         if selected_item:
             self.tree.selection_remove(selected_item)
+

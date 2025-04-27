@@ -27,6 +27,22 @@ class MonHocController:
             print(f"Lỗi khi lấy danh sách môn học: {e}")
             return []
 
+    def check_exists(self, ma_mh):
+        try:
+            return self.mon_hoc_models.check_exists(ma_mh)
+        except Exception as e:
+            print(f"Lỗi khi kiểm tra tồn tại môn học: {e}")
+            return False
+
+    def check_exists_for_update(self, ma_mh_moi, ma_mh_cu):
+        try:
+            if ma_mh_moi == ma_mh_cu:
+                return False
+            return self.mon_hoc_models.check_exists(ma_mh_moi)
+        except Exception as e:
+            print(f"Lỗi khi kiểm tra tồn tại giảng viên khi cập nhật: {e}")
+            return False
+
     def delete(self, ma_mon):
         try:
             self.mon_hoc_models.delete(ma_mon)
@@ -41,5 +57,7 @@ class MonHocController:
         except Exception as e:
             print(f"Lỗi khi tìm kiếm môn học: {e}")
             return []
+
+
 
 

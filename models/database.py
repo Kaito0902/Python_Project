@@ -8,8 +8,8 @@ class Database:
             self.conn = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="khanh",
-                database="quan_ly_sinh_vien"
+                password="",
+                database="qldsv"
             )
             self.cursor = self.conn.cursor(dictionary=True)
             print("✅ Kết nối database thành công!")
@@ -31,8 +31,19 @@ class Database:
         except mysql.connector.Error as e:
             logging.error("❌ Lỗi thực thi SQL!", exc_info=True)
 
+    def fetch_all(self, query, params=None):
+        """Thực thi SELECT và trả về danh sách kết quả"""
+        try:
+            self.cursor.execute(query, params or ())
+            result = self.cursor.fetchall()
+            return result
+        except mysql.connector.Error as err:
+            print(f"❌ Lỗi lấy dữ liệu: {err}")
+            return []
+
     def close(self):
         if self.conn:
             self.cursor.close()
             self.conn.close()
             print("✅ Đã đóng kết nối database!")
+

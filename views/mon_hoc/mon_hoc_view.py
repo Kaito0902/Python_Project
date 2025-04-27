@@ -1,7 +1,10 @@
+from PIL import Image
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 from views.mon_hoc.insert_mon_hoc import ThemMonHocWindow
+from views.mon_hoc.update_mon_hoc import SuaMonHocWindow
 from controllers.mon_hoc_controller import MonHocController
+from controllers.khoa_controller import KhoaController
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
@@ -10,6 +13,7 @@ class MonHocFrame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, corner_radius=15, fg_color="white")
         self.controller = MonHocController()
+        self.khoa_controller = KhoaController()
         self.parent = parent
         self.pack(fill="both", expand=True)
         self.create_widgets()
@@ -28,6 +32,10 @@ class MonHocFrame(ctk.CTkFrame):
         self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
         self.search_entry.pack(side="left", padx=10, pady=20)
         self.search_entry.bind("<KeyRelease>", self.tim_kiem_mon_hoc)
+
+        icon = ctk.CTkImage(Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize((20, 20)), size=(20, 20))
+        btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=None)
+        btn_search.pack(side="left", pady=20)
 
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
@@ -63,7 +71,7 @@ class MonHocFrame(ctk.CTkFrame):
         if not hasattr(self, "selected_mh"):
             messagebox.showwarning("Cảnh báo", "Vui lòng chọn môn học trước!")
             return
-        # sửa
+        SuaMonHocWindow(self, self.tree, self.controller)
 
     def xoa_mon_hoc(self):
         if not hasattr(self, "selected_mh"):
@@ -84,8 +92,13 @@ class MonHocFrame(ctk.CTkFrame):
             ma_mh = mon_hoc.get("ma_mon", "")
             ten_mh = mon_hoc.get("ten_mon", "")
             so_tin_chi = mon_hoc.get("so_tin_chi", "")
-            khoa = mon_hoc.get("khoa", "")
-            self.tree.insert("", "end", values=(ma_mh, ten_mh, so_tin_chi, khoa))
+            id_khoa = mon_hoc.get("khoa", "")
+
+            # Lấy tên khoa bằng id
+            khoa_info = self.khoa_controller.select_by_id(id_khoa)
+            ten_khoa = khoa_info.get("ten_khoa", "") if khoa_info else ""
+
+            self.tree.insert("", "end", values=(ma_mh, ten_mh, so_tin_chi, ten_khoa))
 
     def load_data(self):
         self.fill_tree(self.controller.select_all())

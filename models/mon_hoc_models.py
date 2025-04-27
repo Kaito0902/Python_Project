@@ -17,12 +17,18 @@ class MonHocModels:
         return self.db.execute_commit(query, (ma_mon, ten_mon, so_tin_chi, khoa))
 
     def update(self, ma_mon, ten_mon, so_tin_chi, khoa):
-        query = "UPDATE mon_hoc SET ten_mon = %s, so_tin_chi = %d, khoa = %s,  WHERE ma_mon = %s"
+        query = "UPDATE mon_hoc SET ten_mon = %s, so_tin_chi = %s, khoa = %s WHERE ma_mon = %s"
         return self.db.execute_commit(query, (ten_mon, so_tin_chi, khoa, ma_mon))
 
     def delete(self, ma_mon):
         query = "UPDATE mon_hoc SET trang_thai = 0 WHERE ma_mon = %s"
         return self.db.execute_commit(query, (ma_mon,))
+
+    def check_exists(self, ma_mon):
+        query = "SELECT COUNT(*) FROM mon_hoc WHERE ma_mon = %s"
+        result = self.db.execute_query(query, (ma_mon,))
+        count = result[0]['COUNT(*)'] if result else 0
+        return count > 0
 
 
 

@@ -9,6 +9,7 @@ from tkcalendar import DateEntry
 
 from controllers.sinh_vien_controller import SinhVienController
 
+
 class StudentFrame(ctk.CTkFrame):
     def add_student(self):
         data = self.get_form_data()
@@ -80,7 +81,7 @@ class StudentFrame(ctk.CTkFrame):
             "que": self.entry_hometown.get().strip(),
             "email": self.entry_email.get().strip()
         }
-    
+
     def validate_student_data(self, data):
         if not data["mssv"].isdigit():
             messagebox.showerror("Cảnh cáo", "Mã sinh viên chỉ được chứa số.")
@@ -226,7 +227,7 @@ class StudentFrame(ctk.CTkFrame):
         self.entry_search = ctk.CTkEntry(search_frame,placeholder_text="Tìm kiếm...", width=200, height=30, border_width=1, fg_color="white", text_color="black")
         self.entry_search.grid(row=1, column=0, pady=5)
 
-        icon = ctk.CTkImage(Image.open(r"resources\images\search.png").resize((20,20)), size=(20, 20))
+        icon = ctk.CTkImage(Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize((20,20)), size=(20, 20))
         ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=self.search_student).grid(row=1, column=1, pady=5)
 
         # Nút chức năng

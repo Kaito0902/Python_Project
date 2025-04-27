@@ -2,14 +2,21 @@ import customtkinter as ctk
 from tkinter import ttk, messagebox
 from tkinter import filedialog
 
+
 class BangDiemLop(ctk.CTkFrame):
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__(parent, corner_radius=15, fg_color="white")
         self.pack(fill="both", expand=True, padx=10, pady=10)
 
         self.cot_co_dinh = ["MSSV", "Tên Sinh Viên", "Ngày Sinh", "Giới Tính", "Điểm Kiểm Tra"]
         self.cot_diem_list = []
-        ctk.CTkLabel(self, text="BẢNG ĐIỂM LỚP", font=("Arial", 18, "bold")).pack(pady=10)
+
+        header_frame = ctk.CTkFrame(self, fg_color="#646765", height=100)
+        header_frame.pack(fill="x")
+
+        label_title = ctk.CTkLabel(header_frame, text="Cấu Hình Điểm", font=("Verdana", 18, "bold"),
+                                   text_color="#ffffff")
+        label_title.pack(pady=20)
 
         self.info_frame = ctk.CTkFrame(self)
         self.info_frame.pack(fill="x", pady=5, padx=10)
@@ -45,7 +52,12 @@ class BangDiemLop(ctk.CTkFrame):
 
         columns = cot_truoc_diem_kt + [ten for ten, ts in self.cot_diem_list] + cot_sau_diem_kt
 
-        self.tree = ttk.Treeview(self.tree_frame, columns=columns, show="headings")
+        style = ttk.Style()
+        style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
+        style.configure("Treeview.Heading", font=("Arial", 12, "bold"), background="#3084ee", foreground="black")
+        style.map("Treeview", background=[("selected", "#4CAF50")], foreground=[("selected", "white")])
+
+        self.tree = ttk.Treeview(self.tree_frame, columns=columns, show="headings", style="Treeview")
         self.tree.pack(fill="both", expand=True)
 
         for col in columns:
