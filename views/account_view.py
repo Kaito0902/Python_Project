@@ -49,7 +49,7 @@ class AccountManager(ctk.CTkFrame):
         self.search_entry.bind("<KeyRelease>", self.search_user)
 
         icon = ctk.CTkImage(
-            Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize(
+            Image.open(r"G:\python\Python_Project\resources\images\search.png").resize(
                 (20, 20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
                                    hover_color="#ffffff", command=None)
@@ -59,10 +59,14 @@ class AccountManager(ctk.CTkFrame):
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
 
-        ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", command=self.add_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", command=self.edit_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", text_color="white", command=self.delete_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", command=self.view_logs, width=80).pack(side="left", padx=5)
+        # lưu tham chiếu các nút để phân quyền
+        self.btn_add = ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", command=self.add_user, width=80)
+        self.btn_edit = ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", command=self.edit_user, width=80)
+        self.btn_delete = ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", text_color="white", command=self.delete_user, width=80)
+        self.btn_logs = ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", command=self.view_logs, width=80)
+        for w in (self.btn_add, self.btn_edit, self.btn_delete, self.btn_logs):
+            w.pack(side="left", padx=5)
+        self.apply_permissions()
 
         style = ttk.Style()
         style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
@@ -77,6 +81,16 @@ class AccountManager(ctk.CTkFrame):
             self.tree.column(col, anchor="center")
 
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
+
+    def apply_permissions(self):
+        """
+        Phân quyền động: chỉ admin mở được nút thêm, sửa, vô hiệu hóa.
+        """
+        role = current_user.get("vai_tro_id")
+        # nếu không phải admin thì disable các nút
+        if role != "admin":
+            for btn in (self.btn_add, self.btn_edit, self.btn_delete, self.btn_logs):
+                btn.configure(state="disabled")
 
     def load_data(self):
         try:
@@ -400,11 +414,19 @@ def validate_user_update(username, password, vai_tro, parent_window):
         return False
     return True
 
-#
-# if __name__ == "__main__":
-#      # Giả sử người dùng đã đăng nhập với vai trò admin
-#     current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro_id": "admin"})
-#     root = ctk.CTk()
-#     root.withdraw()
-#     app = AccountManager(root)
-#     app.mainloop()
+
+#if __name__ == "__main__":
+    # Giả sử người dùng đã đăng nhập với vai trò admin
+    current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro": "giang_vien"})
+    
+    # Tạo cửa sổ chính
+    root = ctk.CTk()
+    root.title("Quản Lý Tài Khoản")
+    root.geometry("1000x600")
+    
+    # Tạo frame chính và đặt vào cửa sổ
+    app = AccountManager(root)
+    
+    # Chạy ứng dụng
+    root.mainloop()
+

@@ -9,7 +9,7 @@ class Database:
                 host="localhost",
                 user="root",
                 password="",
-                database="qldsv"
+                database="quan_ly_diem"
             )
             self.cursor = self.conn.cursor(dictionary=True)
             print("✅ Kết nối database thành công!")
