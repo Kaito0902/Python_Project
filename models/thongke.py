@@ -6,10 +6,15 @@ class ThongKeModel:
         self.db = Database()
 
     def lay_all_diem(self):
-
-        sql = (
-            "SELECT d.mssv, d.diem_tong_ket, l.nam AS nam "
-            "FROM diem d "
-            "JOIN lop l ON d.ma_mon = l.ma_mon"
-        )
+        sql = """
+          SELECT d.ma_lop, l.nam,
+                 COUNT(*)              AS si_so,
+                 SUM(d.diem_tong_ket>=5) AS dau,
+                 SUM(d.diem_tong_ket<5)  AS rot,
+                 ROUND(AVG(d.diem_tong_ket),2) AS diem_tb
+          FROM diem d
+          JOIN lop l ON d.ma_lop = l.ma_lop
+          GROUP BY d.ma_lop, l.nam
+          ORDER BY l.nam;
+        """
         return self.db.execute_query(sql)

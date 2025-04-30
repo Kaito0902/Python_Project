@@ -34,19 +34,36 @@ class DiemView(ctk.CTkFrame):
         self.combo.grid(row=0, column=1, padx=5)
         self.combo['values'] = [m['ma_mon'] for m in self.ctrl.lay_danh_sach_mon()]
 
-    def _load_and_save(self):
-        ma_mon = self.combo.get().strip()
-        if not ma_mon:
-            messagebox.showwarning("Cảnh báo", "Chưa chọn mã môn!")
-            return
-        path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg")])
-        if not path: return
-        try:
-            img = Image.open(path).resize((200, 200))
-            photo = ctk.CTkImage(light_image=img, size=(200, 200))
-            self.lbl_preview.configure(image=photo, text="")
-            self.lbl_preview.image = photo
-            res = self.ctrl.quet_va_lưu(path, ma_mon)
-            self.lbl_res.configure(text=f"MSSV: {res['mssv']} | CK: {res['diem_cuoi_ky']} | TK: {res['diem_tong_ket']}")
-        except Exception as e:
-            messagebox.showerror("Lỗi", str(e))
+def _load_and_save(self):
+    ma_mon = self.combo.get().strip()
+    if not ma_mon:
+        messagebox.showwarning("Cảnh báo", "Chưa chọn mã môn!")
+        return
+
+    path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg")])
+    if not path:
+        return
+
+    # Hiển thị preview ảnh
+    img = Image.open(path).resize((200, 200))
+    photo = ctk.CTkImage(light_image=img, size=(200, 200))
+    self.lbl_preview.configure(image=photo, text="")
+    self.lbl_preview.image = photo
+
+    # Thực hiện quét và lưu, bắt exception rõ ràng
+    try:
+        res = self.ctrl.quet_va_lưu(path, ma_mon)
+    except Exception as e:
+        messagebox.showerror("Lỗi lưu điểm", str(e))
+        return
+
+    # Hiển thị đầy đủ: MSSV, Điểm KT, CK, TK và Xếp loại
+    self.lbl_res.configure(
+        text=(
+            f"MSSV: {res['mssv']} | "
+            f"KT: {res['diem_kiem_tra']} | "
+            f"CK: {res['diem_cuoi_ky']} | "
+            f"TK: {res['diem_tong_ket']} | "
+            f"XL: {res['xep_loai']}"
+        )
+    )

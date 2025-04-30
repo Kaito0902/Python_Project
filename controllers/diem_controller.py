@@ -22,7 +22,8 @@ class DiemController:
                 xl = 'Yeu'
             success = self.model.cap_nhat_diem(mssv, ma_mon, kt, ck, tk, xl)
             if not success:
-                return None
+                raise RuntimeError(f"Cập nhật điểm thất bại cho MSSV={mssv}, môn={ma_mon}")
+
             return {
                 'mssv': mssv,
                 'diem_kiem_tra': kt,
