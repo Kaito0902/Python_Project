@@ -227,7 +227,7 @@ class StudentFrame(ctk.CTkFrame):
         self.entry_search = ctk.CTkEntry(search_frame,placeholder_text="Tìm kiếm...", width=200, height=30, border_width=1, fg_color="white", text_color="black")
         self.entry_search.grid(row=1, column=0, pady=5)
 
-        icon = ctk.CTkImage(Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize((20,20)), size=(20, 20))
+        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize((20,20)), size=(20, 20))
         ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=self.search_student).grid(row=1, column=1, pady=5)
 
         # Nút chức năng

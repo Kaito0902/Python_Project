@@ -27,7 +27,7 @@ class LopGiangVienFrame(ctk.CTkFrame):
         self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
         self.search_entry.pack(side="left", padx=10, pady=20)
         
-        icon = ctk.CTkImage(Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize((20,20)), size=(20, 20))
+        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize((20,20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=None)
         btn_search.pack(side="left", pady=20)
 

@@ -19,7 +19,7 @@ class LogModels:
         Lấy danh sách nhật ký từ bảng nhat_ky, sắp xếp theo thời gian giảm dần.
         Trả về danh sách các dict với các khóa: id, ma_nguoi_dung, hanh_dong, thoi_gian.
         """
-        query = "SELECT id, ma_nguoi_dung, hanh_dong, thoi_gian FROM nhat_ky ORDER BY thoi_gian DESC"
+        query = "SELECT id, ma_nguoi_dung, hanh_dong, thoi_gian FROM nhat_ky ORDER BY id ASC"
         return self.db.fetch_all(query)
 
     def authenticate(self, username, password):

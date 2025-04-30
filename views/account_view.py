@@ -49,7 +49,7 @@ class AccountManager(ctk.CTkFrame):
         self.search_entry.bind("<KeyRelease>", self.search_user)
 
         icon = ctk.CTkImage(
-            Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize(
+            Image.open(r"G:\python\Python_Project\resources\images\search.png").resize(
                 (20, 20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
                                    hover_color="#ffffff", command=None)
@@ -59,10 +59,14 @@ class AccountManager(ctk.CTkFrame):
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
 
-        ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", command=self.add_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", command=self.edit_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", text_color="white", command=self.delete_user, width=80).pack(side="left", padx=5)
-        ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", command=self.view_logs, width=80).pack(side="left", padx=5)
+        # lưu tham chiếu các nút để phân quyền
+        self.btn_add = ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", command=self.add_user, width=80)
+        self.btn_edit = ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", command=self.edit_user, width=80)
+        self.btn_delete = ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", text_color="white", command=self.delete_user, width=80)
+        self.btn_logs = ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", command=self.view_logs, width=80)
+        for w in (self.btn_add, self.btn_edit, self.btn_delete, self.btn_logs):
+            w.pack(side="left", padx=5)
+        
 
         style = ttk.Style()
         style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
@@ -77,6 +81,8 @@ class AccountManager(ctk.CTkFrame):
             self.tree.column(col, anchor="center")
 
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
+
+    
 
     def load_data(self):
         try:
@@ -96,7 +102,7 @@ class AccountManager(ctk.CTkFrame):
         self.tree.delete(*self.tree.get_children())  # Xóa toàn bộ danh sách cũ trong Treeview
 
         for acc in self.all_accounts:  # Duyệt qua danh sách lưu sẵn
-             if (search_text in acc['username'].lower()):
+             if (search_text in acc['ma_nguoi_dung'].lower()):
                 self.tree.insert("", "end", values=(acc['ma_nguoi_dung'], acc['username'], acc['password'], acc['vai_tro']))
                 
 
@@ -129,6 +135,8 @@ class AccountManager(ctk.CTkFrame):
         self.add_window.grab_set()  # Ngăn không cho thao tác trên cửa sổ chính khi cửa sổ con mở
         self.add_window.focus_set()  # Đặt tiêu điểm vào cửa sổ con
 
+        danh_sach_vai_tro = self.controller.lay_danh_sach_vai_tro()
+
         # Kích thước ô nhập
         entry_width = 25
 
@@ -149,8 +157,8 @@ class AccountManager(ctk.CTkFrame):
 
         # Vai trò
         tk.Label(self.add_window, text="Vai trò:").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        vai_tro_combobox = CTkComboBox(self.add_window, values=["admin", "giang_vien", "sinh_vien"], width=160)
-        vai_tro_combobox.set("sinh_vien")
+        vai_tro_combobox = CTkComboBox(self.add_window, values=danh_sach_vai_tro, width=160)
+        vai_tro_combobox.set(danh_sach_vai_tro[0] if danh_sach_vai_tro else "Chưa có vai trò")
         vai_tro_combobox.grid(row=3, column=1, padx=10, pady=5)
 
 
@@ -170,7 +178,15 @@ class AccountManager(ctk.CTkFrame):
 
             try:
                 self.controller.add_account(ma_nguoi_dung, username, password, vai_tro)
-                self.log_controller.ghi_nhat_ky(current_user.get("ma_nguoi_dung", "unknown"),f"Thêm người dùng: {username}")
+
+                # 🚀 Kiểm tra `current_user` trước khi ghi nhật ký
+                current_ma_nguoi_dung = current_user.get("ma_nguoi_dung", None)
+                if not current_ma_nguoi_dung or current_ma_nguoi_dung == "unknown":
+                    print("❌ Không thể ghi nhật ký! `ma_nguoi_dung` không hợp lệ.")
+                else:
+                    print("🔍 Đang ghi nhật ký với ma_nguoi_dung:", current_ma_nguoi_dung)
+                    self.log_controller.ghi_nhat_ky(current_ma_nguoi_dung, f"Thêm người dùng: {username}")
+
                 messagebox.showinfo("Thành công", "Người dùng đã được thêm thành công!", parent=self.add_window)
                 self.add_window.destroy()  # Đóng form sau khi thêm xong
                 self.load_data()  # Load lại dữ liệu
@@ -178,7 +194,7 @@ class AccountManager(ctk.CTkFrame):
                 messagebox.showerror("Lỗi", f"Không thể thêm người dùng: {e}", parent=self.add_window)
 
         # Nút Thêm
-        tk.Button(self.add_window, text="Thêm", command=submit, width= 7).grid(row=4, column=0, columnspan=2, pady=10)
+        btn_add=ctk.CTkButton(self.add_window, fg_color="#4CAF50", text="Thêm", text_color="white", command=submit, width= 7).grid(row=4, column=0, columnspan=2, pady=10)
 
  
     def edit_user(self):
@@ -191,12 +207,12 @@ class AccountManager(ctk.CTkFrame):
             messagebox.showwarning("Cảnh báo", "Vui lòng chọn một người dùng để sửa", parent=self)
             return
 
-        values = self.tree.item(selected_item)['values']
+        values = self.tree.item(selected_item[0])['values']
         if not values:
             messagebox.showwarning("Cảnh báo", "Dữ liệu không hợp lệ!", parent=self)
             return
 
-        ma_nguoi_dung_value = values[0]
+        ma_nguoi_dung_value = values[0] if values else ""
         username_value = values[1]
         password_value = values[2]
         vai_tro_value = values[3]
@@ -225,11 +241,14 @@ class AccountManager(ctk.CTkFrame):
         self.edit_window.grab_set()
         self.edit_window.focus_set()
 
+        danh_sach_vai_tro = self.controller.lay_danh_sach_vai_tro()
+
         entry_width = 25
         # Tạo nhãn và ô nhập với giá trị ban đầu
         tk.Label(self.edit_window, text="Mã người dùng:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        ma_nguoi_dung_Entry = tk.Entry(self.edit_window, state="disabled", width = entry_width)
+        ma_nguoi_dung_Entry = tk.Entry(self.edit_window, state="normal", width = entry_width)
         ma_nguoi_dung_Entry.insert(0, ma_nguoi_dung_value)
+        ma_nguoi_dung_Entry.config(state="disabled")
         ma_nguoi_dung_Entry.grid(row=0, column=1, padx=10, pady=5)
 
         tk.Label(self.edit_window, text="Username:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
@@ -243,8 +262,8 @@ class AccountManager(ctk.CTkFrame):
         password_entry.grid(row=2, column=1, padx=10, pady=5)
 
         tk.Label(self.edit_window, text="Vai trò:").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        vai_tro_combobox = CTkComboBox(self.edit_window, values=["admin", "giang_vien", "sinh_vien"], width=160)
-        vai_tro_combobox.set(vai_tro_value)  # Giá trị hiện tại
+        vai_tro_combobox = CTkComboBox(self.edit_window, values=danh_sach_vai_tro, width=160)
+        vai_tro_combobox.set(danh_sach_vai_tro[0])  # Giá trị hiện tại
         vai_tro_combobox.grid(row=3, column=1, padx=10, pady=5)
 
 
@@ -400,11 +419,19 @@ def validate_user_update(username, password, vai_tro, parent_window):
         return False
     return True
 
-#
-# if __name__ == "__main__":
-#      # Giả sử người dùng đã đăng nhập với vai trò admin
-#     current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro_id": "admin"})
-#     root = ctk.CTk()
-#     root.withdraw()
-#     app = AccountManager(root)
-#     app.mainloop()
+
+#if __name__ == "__main__":
+    # Giả sử người dùng đã đăng nhập với vai trò admin
+    current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro": "giang_vien"})
+    
+    # Tạo cửa sổ chính
+    root = ctk.CTk()
+    root.title("Quản Lý Tài Khoản")
+    root.geometry("1000x600")
+    
+    # Tạo frame chính và đặt vào cửa sổ
+    app = AccountManager(root)
+    
+    # Chạy ứng dụng
+    root.mainloop()
+
