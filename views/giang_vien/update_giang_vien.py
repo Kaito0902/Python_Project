@@ -1,0 +1,131 @@
+import customtkinter as ctk
+from tkinter import messagebox
+from controllers.khoa_controller import KhoaController
+from controllers.giang_vien_controller import GiangVienController
+
+ctk.set_appearance_mode("light")
+ctk.set_default_color_theme("blue")
+
+
+class SuaGiangVienWindow(ctk.CTkToplevel):
+    def __init__(self, parent, tree, controller: GiangVienController):
+        super().__init__(parent)
+        self.parent = parent
+        self.tree = tree
+        self.controller = controller
+        self.khoacontroller = KhoaController()
+        self.title("Sửa Giảng Viên")
+        self.geometry("500x300")
+        self.configure(bg="#f5f5f5")
+
+        self.attributes('-topmost', True)
+
+        self.create_input_row("Mã GV:", "ma_gv_entry")
+        self.create_input_row("Tên GV:", "ten_gv_entry")
+        self.create_khoa_row()
+        self.create_input_row("Email:", "email_entry")
+        self.create_input_row("SĐT:", "sdt_entry")
+
+        button_frame = ctk.CTkFrame(self, fg_color="white")
+        button_frame.pack(pady=10, fill="x")
+
+        ctk.CTkButton(button_frame, text="Sửa", command=self.sua_giang_vien).pack(side="left", padx=10, pady=5)
+        ctk.CTkButton(button_frame, text="Hủy bỏ", command=self.destroy).pack(side="right", padx=10, pady=5)
+
+        self.load_khoa_options()
+        self.load_selected_item()
+
+    def create_input_row(self, label_text, entry_attr):
+        frame = ctk.CTkFrame(self, fg_color="white")
+        frame.pack(pady=5, padx=10, fill="x")
+
+        label = ctk.CTkLabel(frame, text=label_text, width=80, anchor="w")
+        label.pack(side="left", padx=10)
+
+        entry = ctk.CTkEntry(frame, width=300)
+        entry.pack(side="left", padx=10)
+
+        setattr(self, entry_attr, entry)
+
+    def create_khoa_row(self):
+        frame = ctk.CTkFrame(self, fg_color="white")
+        frame.pack(pady=5, padx=10, fill="x")
+
+        label = ctk.CTkLabel(frame, text="Khoa:", width=80, anchor="w")
+        label.pack(side="left", padx=10)
+
+        self.khoa_combobox = ctk.CTkComboBox(frame, width=300, values=[])
+        self.khoa_combobox.pack(side="left", padx=10)
+
+    def load_khoa_options(self):
+        khoa_list = self.khoacontroller.select_all()
+        self.khoa_mapping = {khoa["ten_khoa"]: khoa["ma_khoa"] for khoa in khoa_list}
+        ten_khoa_list = list(self.khoa_mapping.keys())
+        self.khoa_combobox.configure(values=ten_khoa_list)
+
+    def load_selected_item(self):
+        selected = self.tree.selection()
+        if selected:
+            values = self.tree.item(selected[0], "values")
+            if values:
+                # Giả sử giá trị treeview theo thứ tự: mã GV, tên GV, tên khoa, email, số điện thoại
+                self.ma_gv_entry.insert(0, values[0])
+                self.ten_gv_entry.insert(0, values[1])
+                self.khoa_combobox.set(values[2])  # Set combobox theo tên khoa
+                self.email_entry.insert(0, values[3])
+                self.sdt_entry.insert(0, values[4])
+
+    def sua_giang_vien(self):
+        ma_gv = self.ma_gv_entry.get().strip()
+        ten_gv = self.ten_gv_entry.get().strip()
+        ten_khoa = self.khoa_combobox.get().strip()
+        email = self.email_entry.get().strip()
+        sdt = self.sdt_entry.get().strip()
+
+        if not (ma_gv and ten_gv and ten_khoa and email and sdt):
+            self.attributes('-topmost', False)
+            messagebox.showerror("Lỗi", "Vui lòng nhập đầy đủ thông tin!")
+            self.attributes('-topmost', True)
+            return
+
+        selected_item = self.tree.selection()
+        if selected_item:
+            old_values = self.tree.item(selected_item[0], "values")
+            ma_gv_cu = old_values[0]
+
+            if self.controller.check_exists_for_update(ma_gv, ma_gv_cu):
+                self.attributes('-topmost', False)
+                messagebox.showerror("Lỗi", "Mã giảng viên đã tồn tại, vui lòng nhập mã khác!")
+                self.attributes('-topmost', True)
+                return
+
+        # Lấy mã khoa từ tên khoa
+        ma_khoa = self.khoa_mapping.get(ten_khoa)
+
+        if not ma_khoa:
+            self.attributes('-topmost', False)
+            messagebox.showerror("Lỗi", "Không tìm thấy mã khoa tương ứng!")
+            self.attributes('-topmost', True)
+            return
+
+        selected_item = self.tree.selection()
+        if not selected_item:
+            self.attributes('-topmost', False)
+            messagebox.showerror("Lỗi", "Vui lòng chọn giảng viên cần sửa!")
+            self.attributes('-topmost', True)
+            return
+
+        try:
+            # Gọi controller để update giảng viên
+            success = self.controller.update(ma_gv, ten_gv, ma_khoa, email, sdt)
+            if success:
+                self.attributes('-topmost', False)
+                messagebox.showinfo("Thành công", "Đã cập nhật thông tin giảng viên!")
+                self.parent.load_data()  # Load lại dữ liệu từ database
+                self.destroy()
+            else:
+                raise ValueError("Không thể cập nhật giảng viên!")
+        except Exception as e:
+            self.attributes('-topmost', False)
+            messagebox.showerror("Lỗi", f"Lỗi khi cập nhật giảng viên: {str(e)}")
+
