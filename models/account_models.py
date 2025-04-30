@@ -3,47 +3,52 @@ from models.database import Database
 
 class AccountModels:
     def __init__(self):
-        self.db = Database()
+        self.db = Database()  # Kết nối database
 
     def get_all_accounts(self):
-        return self.db.fetch_all("SELECT ma_nguoi_dung, username, password, vai_tro FROM tai_khoan")
+        """Lấy danh sách tất cả tài khoản"""
+        query = "SELECT ma_nguoi_dung, username, password, vai_tro FROM tai_khoan"
+        return self.db.fetch_all(query)
+    
+    def lay_danh_sach_vai_tro(self):
+        query = "SELECT ten_vai_tro FROM vai_tro"
+        rows = self.db.fetch_all(query)
+        if not rows:  # Kiểm tra nếu danh sách rỗng
+            print("⚠ Không tìm thấy vai trò nào trong database!")
+
+        return [row["ten_vai_tro"] for row in rows]  # Trả về danh sách vai trò
+
+    def get_by_ma_nguoi_dung(self, ma_nguoi_dung):
+        """Lấy thông tin tài khoản theo mã người dùng"""
+        query = "SELECT * FROM tai_khoan WHERE ma_nguoi_dung = %s"
+        result = self.db.execute_query(query, (ma_nguoi_dung,))
+        return result[0] if result else None
 
     def add_account(self, ma_nguoi_dung, username, password, vai_tro):
+        """Thêm tài khoản vào database"""
         query = "INSERT INTO tai_khoan (ma_nguoi_dung, username, password, vai_tro) VALUES (%s, %s, %s, %s)"
         values = (ma_nguoi_dung, username, password, vai_tro)
-        self.db.execute_query(query, values)
+        self.db.execute_query(query, values, commit=True)
 
     def update_account(self, ma_nguoi_dung, username, password, vai_tro):
+        """Cập nhật thông tin tài khoản"""
         query = "UPDATE tai_khoan SET username = %s, password = %s, vai_tro = %s WHERE ma_nguoi_dung = %s"
         values = (username, password, vai_tro, ma_nguoi_dung)
-        self.db.execute_query(query, values)
+        self.db.execute_query(query, values, commit=True)
 
     def delete_account(self, ma_nguoi_dung):
+        """Xóa tài khoản"""
         query = "DELETE FROM tai_khoan WHERE ma_nguoi_dung = %s"
-        self.db.execute_query(query, (ma_nguoi_dung,))
+        self.db.execute_query(query, (ma_nguoi_dung,), commit=True)
 
-    def check_permission(self, user_role, permission):
-        """Kiểm tra vai trò có quyền thực hiện hành động không"""
-        conn = self.db.connect()
-        cursor = conn.cursor()
-        query = """
-            SELECT 1 FROM phan_quyen
-            JOIN vai_tro ON phan_quyen.vai_tro_id = vai_tro.id
-            JOIN quyen ON phan_quyen.quyen_id = quyen.id
-            WHERE vai_tro.ten_vai_tro = %s AND quyen.ten_quyen = %s
-        """
-        cursor.execute(query, (user_role, permission))
-        result = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        return result is not None
+    
 
-    def log_action(self, nguoi_dung, hanh_dong):
+    def log_action(self, ma_nguoi_dung, hanh_dong):
         """Ghi lại hành động của người dùng vào nhật ký"""
         conn = self.db.connect()
         cursor = conn.cursor()
-        query = "INSERT INTO nhat_ky (nguoi_dung, hanh_dong) VALUES (%s, %s)"
-        cursor.execute(query, (nguoi_dung, hanh_dong))
+        query = "INSERT INTO nhat_ky (ma_nguoi_dung, hanh_dong) VALUES (%s, %s)"
+        cursor.execute(query, (ma_nguoi_dung, hanh_dong))
         conn.commit()
         cursor.close()
         conn.close()

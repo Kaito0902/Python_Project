@@ -1,10 +1,15 @@
 from models.mon_hoc_models import MonHocModels
+from session import current_user_permissions
 
 class MonHocController:
     def __init__(self):
         self.mon_hoc_models = MonHocModels()
 
     def insert(self, ma_mon, ten_mon, so_tin_chi, khoa):
+        if not current_user_permissions.get("mon_hoc", {}).get("them"):
+            print("Bạn không có quyền thêm môn học!")
+            return False
+
         try:
             self.mon_hoc_models.insert(ma_mon, ten_mon, so_tin_chi, khoa)
             return True

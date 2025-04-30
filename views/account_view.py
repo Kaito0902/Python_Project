@@ -66,7 +66,7 @@ class AccountManager(ctk.CTkFrame):
         self.btn_logs = ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", command=self.view_logs, width=80)
         for w in (self.btn_add, self.btn_edit, self.btn_delete, self.btn_logs):
             w.pack(side="left", padx=5)
-        self.apply_permissions()
+        
 
         style = ttk.Style()
         style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
@@ -82,15 +82,7 @@ class AccountManager(ctk.CTkFrame):
 
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
 
-    def apply_permissions(self):
-        """
-        Phân quyền động: chỉ admin mở được nút thêm, sửa, vô hiệu hóa.
-        """
-        role = current_user.get("vai_tro_id")
-        # nếu không phải admin thì disable các nút
-        if role != "admin":
-            for btn in (self.btn_add, self.btn_edit, self.btn_delete, self.btn_logs):
-                btn.configure(state="disabled")
+    
 
     def load_data(self):
         try:
@@ -110,7 +102,7 @@ class AccountManager(ctk.CTkFrame):
         self.tree.delete(*self.tree.get_children())  # Xóa toàn bộ danh sách cũ trong Treeview
 
         for acc in self.all_accounts:  # Duyệt qua danh sách lưu sẵn
-             if (search_text in acc['username'].lower()):
+             if (search_text in acc['ma_nguoi_dung'].lower()):
                 self.tree.insert("", "end", values=(acc['ma_nguoi_dung'], acc['username'], acc['password'], acc['vai_tro']))
                 
 
@@ -143,6 +135,8 @@ class AccountManager(ctk.CTkFrame):
         self.add_window.grab_set()  # Ngăn không cho thao tác trên cửa sổ chính khi cửa sổ con mở
         self.add_window.focus_set()  # Đặt tiêu điểm vào cửa sổ con
 
+        danh_sach_vai_tro = self.controller.lay_danh_sach_vai_tro()
+
         # Kích thước ô nhập
         entry_width = 25
 
@@ -163,8 +157,8 @@ class AccountManager(ctk.CTkFrame):
 
         # Vai trò
         tk.Label(self.add_window, text="Vai trò:").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        vai_tro_combobox = CTkComboBox(self.add_window, values=["admin", "giang_vien", "sinh_vien"], width=160)
-        vai_tro_combobox.set("sinh_vien")
+        vai_tro_combobox = CTkComboBox(self.add_window, values=danh_sach_vai_tro, width=160)
+        vai_tro_combobox.set(danh_sach_vai_tro[0] if danh_sach_vai_tro else "Chưa có vai trò")
         vai_tro_combobox.grid(row=3, column=1, padx=10, pady=5)
 
 
@@ -184,7 +178,15 @@ class AccountManager(ctk.CTkFrame):
 
             try:
                 self.controller.add_account(ma_nguoi_dung, username, password, vai_tro)
-                self.log_controller.ghi_nhat_ky(current_user.get("ma_nguoi_dung", "unknown"),f"Thêm người dùng: {username}")
+
+                # 🚀 Kiểm tra `current_user` trước khi ghi nhật ký
+                current_ma_nguoi_dung = current_user.get("ma_nguoi_dung", None)
+                if not current_ma_nguoi_dung or current_ma_nguoi_dung == "unknown":
+                    print("❌ Không thể ghi nhật ký! `ma_nguoi_dung` không hợp lệ.")
+                else:
+                    print("🔍 Đang ghi nhật ký với ma_nguoi_dung:", current_ma_nguoi_dung)
+                    self.log_controller.ghi_nhat_ky(current_ma_nguoi_dung, f"Thêm người dùng: {username}")
+
                 messagebox.showinfo("Thành công", "Người dùng đã được thêm thành công!", parent=self.add_window)
                 self.add_window.destroy()  # Đóng form sau khi thêm xong
                 self.load_data()  # Load lại dữ liệu
@@ -192,7 +194,7 @@ class AccountManager(ctk.CTkFrame):
                 messagebox.showerror("Lỗi", f"Không thể thêm người dùng: {e}", parent=self.add_window)
 
         # Nút Thêm
-        tk.Button(self.add_window, text="Thêm", command=submit, width= 7).grid(row=4, column=0, columnspan=2, pady=10)
+        btn_add=ctk.CTkButton(self.add_window, fg_color="#4CAF50", text="Thêm", text_color="white", command=submit, width= 7).grid(row=4, column=0, columnspan=2, pady=10)
 
  
     def edit_user(self):
@@ -205,12 +207,12 @@ class AccountManager(ctk.CTkFrame):
             messagebox.showwarning("Cảnh báo", "Vui lòng chọn một người dùng để sửa", parent=self)
             return
 
-        values = self.tree.item(selected_item)['values']
+        values = self.tree.item(selected_item[0])['values']
         if not values:
             messagebox.showwarning("Cảnh báo", "Dữ liệu không hợp lệ!", parent=self)
             return
 
-        ma_nguoi_dung_value = values[0]
+        ma_nguoi_dung_value = values[0] if values else ""
         username_value = values[1]
         password_value = values[2]
         vai_tro_value = values[3]
@@ -239,11 +241,14 @@ class AccountManager(ctk.CTkFrame):
         self.edit_window.grab_set()
         self.edit_window.focus_set()
 
+        danh_sach_vai_tro = self.controller.lay_danh_sach_vai_tro()
+
         entry_width = 25
         # Tạo nhãn và ô nhập với giá trị ban đầu
         tk.Label(self.edit_window, text="Mã người dùng:").grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        ma_nguoi_dung_Entry = tk.Entry(self.edit_window, state="disabled", width = entry_width)
+        ma_nguoi_dung_Entry = tk.Entry(self.edit_window, state="normal", width = entry_width)
         ma_nguoi_dung_Entry.insert(0, ma_nguoi_dung_value)
+        ma_nguoi_dung_Entry.config(state="disabled")
         ma_nguoi_dung_Entry.grid(row=0, column=1, padx=10, pady=5)
 
         tk.Label(self.edit_window, text="Username:").grid(row=1, column=0, padx=10, pady=5, sticky="w")
@@ -257,8 +262,8 @@ class AccountManager(ctk.CTkFrame):
         password_entry.grid(row=2, column=1, padx=10, pady=5)
 
         tk.Label(self.edit_window, text="Vai trò:").grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        vai_tro_combobox = CTkComboBox(self.edit_window, values=["admin", "giang_vien", "sinh_vien"], width=160)
-        vai_tro_combobox.set(vai_tro_value)  # Giá trị hiện tại
+        vai_tro_combobox = CTkComboBox(self.edit_window, values=danh_sach_vai_tro, width=160)
+        vai_tro_combobox.set(danh_sach_vai_tro[0])  # Giá trị hiện tại
         vai_tro_combobox.grid(row=3, column=1, padx=10, pady=5)
 
 
