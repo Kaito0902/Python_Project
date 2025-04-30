@@ -1,31 +1,24 @@
 import os
-import logging
 from tensorflow.keras.models import load_model
 from resources.models_ai.preprocess import preprocess_image
 from resources.models_ai.predict import predict_score_from_image
-from .database import Database
-from config import MODEL_PATH, THRESHOLDS
+from models.database import Database
+from utils.config import MODEL_PATH
 
 class DiemModel:
+    """Xử lý AI và CRUD bảng diem"""
     def __init__(self):
         self.db = Database()
         if not os.path.exists(MODEL_PATH):
-            msg = f"Không tìm thấy mô hình AI tại {MODEL_PATH}"
-            logging.error(msg)
-            raise FileNotFoundError(msg)
-        try:
-            self.ai_model = load_model(MODEL_PATH)
-        except Exception as e:
-            logging.error(f"Tải mô hình AI thất bại: {e}")
-            raise RuntimeError("Tải mô hình AI thất bại.")
+            raise FileNotFoundError(f"Không tìm thấy model tại {MODEL_PATH}")
+        self.ai_model = load_model(MODEL_PATH)
 
-    def trich_xuat(self, path: str) -> tuple:
+    def trich_xuat(self, path: str):
+        """Nhận diện MSSV và điểm CK từ ảnh."""
         if not os.path.isfile(path):
-            raise FileNotFoundError("Ảnh đầu vào không tồn tại.")
+            raise FileNotFoundError("Ảnh không tồn tại")
         img = preprocess_image(path)
         res = predict_score_from_image(self.ai_model, img)
-        if not res or 'mssv' not in res or 'diem' not in res:
-            raise ValueError("Dữ liệu AI không hợp lệ.")
         return res['mssv'], float(res['diem'])
 
     def lay_diem_kiem_tra(self, mssv, ma_mon):
@@ -47,19 +40,3 @@ class DiemModel:
                    "VALUES (%s, %s, %s, %s, %s, %s)")
             params = (mssv, ma_mon, kt, ck, tk, xl)
         return self.db.execute_commit(sql, params) > 0
-
-    def lay_ds_mon_hoc(self):
-        return self.db.execute_query("SELECT ma_mon, ten_mon FROM mon_hoc")
-
-    def lay_diem_theo_mon(self, ma_mon):
-        return self.db.execute_query(
-            "SELECT mssv, diem_kiem_tra, diem_cuoi_ky, diem_tong_ket, xep_loai "
-            "FROM diem WHERE ma_mon=%s", (ma_mon,)
-        )
-
-    def lay_si_so(self, ma_mon):
-        rows = self.db.execute_query(
-            "SELECT COUNT(*) AS si_so FROM dang_ky dk "
-            "JOIN lop l ON dk.ma_lop=l.ma_lop WHERE l.ma_mon=%s", (ma_mon,)
-        )
-        return int(rows[0]['si_so']) if rows else 0
