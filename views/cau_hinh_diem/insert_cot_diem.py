@@ -1,17 +1,20 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from controllers.cau_hinh_diem_controller import CauHinhDiemController
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
 class ThemCotDiemWindow(ctk.CTkToplevel):
-    def __init__(self, parent, tree, callback=None):
+    def __init__(self, parent, ma_lop, bd):
         super().__init__(parent)
-        self.tree = tree
-        self.callback = callback
         self.title("Thêm Cột Điểm")
         self.geometry("500x300")
         self.configure(bg="#f5f5f5")
+        self.parent = parent
+        self.controller = CauHinhDiemController()
+        self.ma_lop = ma_lop
+        self.bd = bd
 
         self.attributes('-topmost', True)
 
@@ -51,17 +54,17 @@ class ThemCotDiemWindow(ctk.CTkToplevel):
         setattr(self, option_attr, option_menu)
 
     def luu_cot_diem(self):
-        ten_cot_diem = self.ten_cot_diem_entry.get()
-        trong_so = self.trong_so_option.get()
+        ten_cot_diem = self.ten_cot_diem_entry.get().strip()
+        trong_so = self.trong_so_option.get().strip()
 
         if not (ten_cot_diem and trong_so):
             self.attributes('-topmost', False)
             messagebox.showwarning("Cảnh báo", "Vui lòng nhập đầy đủ thông tin!")
             return
 
-        self.tree.insert("", "end", values=("", "", ten_cot_diem, trong_so))
+        self.controller.insert(self.ma_lop, ten_cot_diem, trong_so)
+        self.parent.load_data()
+        self.bd.refresh_columns_and_data()
         self.attributes('-topmost', False)
         messagebox.showinfo("Thành công", "Đã lưu cột điểm.")
-        if self.callback:
-            self.callback(ten_cot_diem, trong_so)
         self.destroy()

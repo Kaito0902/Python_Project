@@ -45,8 +45,8 @@ class MainView(ctk.CTk):
         }
 
         ctk.CTkButton(self.menu_frame, text="Tài khoản", **button_style, command=self.show_account_frame).grid(row=1, column=0, pady=5)
-        ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classAdmin_frame).grid(row=2, column=0, pady=5)
-        # ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
+        # ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classAdmin_frame).grid(row=2, column=0, pady=5)
+        ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
         ctk.CTkButton(self.menu_frame, text="Môn học", **button_style, command=self.show_subject_frame).grid(row=3, column=0, pady=5)
         ctk.CTkButton(self.menu_frame, text="Giảng viên", **button_style, command=self.show_teacher_frame).grid(row=4, column=0, pady=5)
         ctk.CTkButton(self.menu_frame, text="Sinh viên", **button_style, command=self.show_student_frame).grid(row=5, column=0, pady=5)
@@ -135,8 +135,9 @@ class MainView(ctk.CTk):
     def show_diemlop_frame(self):
         for widget in self.main_content.winfo_children():
             widget.destroy()
-        bang_diem_lop_frame = QuanLyLopTabbedPane(self.main_content)
+        bang_diem_lop_frame = QuanLyLopTabbedPane(self.main_content, self.selected_ma_lop)
         bang_diem_lop_frame.pack(fill="both", expand=True)
+
 
 if __name__ == "__main__":
     current_user.update({"ma_nguoi_dung": "admin", "username": "admin", "vai_tro_id": "admin"})

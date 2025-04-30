@@ -30,5 +30,9 @@ class MonHocModels:
         count = result[0]['COUNT(*)'] if result else 0
         return count > 0
 
+    def select_by_id(self, ma_mon):
+        query = "SELECT * from mon_hoc WHERE ma_mon = %s"
+        return self.db.execute_query(query, (ma_mon,))
+
 
 

@@ -58,6 +58,13 @@ class MonHocController:
             print(f"Lỗi khi tìm kiếm môn học: {e}")
             return []
 
+    def select_by_id(self, ma_mon):
+        try:
+            return self.mon_hoc_models.select_by_id(ma_mon)
+        except Exception as e:
+            print(f"Lỗi khi lấy môn học: {e}")
+            return []
+
 
 
 

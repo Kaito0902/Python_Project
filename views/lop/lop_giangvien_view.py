@@ -77,8 +77,15 @@ class LopGiangVienFrame(ctk.CTkFrame):
         self.tree.bind("<Double-1>", self.deselect)
 
     def show_detail(self):
-        if self.app:
-            self.app.show_classGV_detail_frame()
+        selected = self.tree.selection()
+        if selected:
+            values = self.tree.item(selected[0], 'values')
+            ma_lop = values[0]
+            if self.app:
+                self.app.selected_ma_lop = ma_lop
+                self.app.show_diemlop_frame()
+        else:
+            messagebox.showwarning("Cảnh báo", "Vui lòng chọn lớp học để xem chi tiết!")
 
     def update_treeview(self, data=None):
         self.tree.delete(*self.tree.get_children())

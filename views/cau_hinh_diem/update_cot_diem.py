@@ -1,19 +1,22 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from controllers.cau_hinh_diem_controller import CauHinhDiemController
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
 class SuaCotDiem(ctk.CTkToplevel):
-    def __init__(self, parent, tree, controller, callback=None):
+    def __init__(self, parent, ma_lop, id, tree, controller: CauHinhDiemController, bd):
         super().__init__(parent)
-        self.tree = tree
+        self.parent = parent
+        self.bd = bd
         self.controller = controller
-        self.callback = callback
+        self.tree = tree
         self.title("Sửa Cột Điểm")
         self.geometry("500x300")
         self.configure(bg="#f5f5f5")
-
+        self.ma_lop = ma_lop
+        self.id = id["id"]
         self.attributes('-topmost', True)
 
         self.create_input_row("Tên Cột Điểm:", "ten_cot_diem_entry")
@@ -59,8 +62,8 @@ class SuaCotDiem(ctk.CTkToplevel):
             values = self.tree.item(selected_item[0], "values")
             if values:
                 # Giả sử cấu trúc treeview là: Mã cột điểm, Tên cột điểm, Trọng số
-                self.ten_cot_diem_entry.insert(0, values[2])
-                self.trong_so_option.set(values[3])
+                self.ten_cot_diem_entry.insert(0, values[1])
+                self.trong_so_option.set(values[2])
 
     def sua_cot_diem(self):
         ten_cot_diem = self.ten_cot_diem_entry.get().strip()
@@ -71,24 +74,17 @@ class SuaCotDiem(ctk.CTkToplevel):
             messagebox.showwarning("Cảnh báo", "Vui lòng nhập đầy đủ thông tin!")
             self.attributes('-topmost', True)
             return
-
-        # Lấy mã cột điểm từ item đã chọn trong treeview
-        selected_item = self.tree.selection()
-        if not selected_item:
-            self.attributes('-topmost', False)
-            messagebox.showwarning("Cảnh báo", "Vui lòng chọn cột điểm cần sửa!")
-            self.attributes('-topmost', True)
-            return
-
         try:
-            # Cập nhật thông tin cột điểm trong treeview
-            self.tree.item(selected_item, values=("", "", ten_cot_diem, trong_so))
+            success = self.controller.update(self.id, self.ma_lop, ten_cot_diem, trong_so)
 
-            self.attributes('-topmost', False)
-            messagebox.showinfo("Thành công", "Đã cập nhật thông tin cột điểm!")
-            if self.callback:
-                self.callback(ten_cot_diem, trong_so)
-            self.destroy()
+            if success:
+                self.attributes('-topmost', False)
+                messagebox.showinfo("Thành công", "Đã cập nhật thông tin cột điểm!")
+                self.parent.load_data()  # Load lại dữ liệu từ database
+                self.bd.refresh_columns_and_data()
+                self.destroy()
+            else:
+                raise ValueError("Không thể cập nhật cột điểm!")
 
         except Exception as e:
             self.attributes('-topmost', False)
