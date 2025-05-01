@@ -6,7 +6,7 @@ class SinhVienModels:
 
     def select_all(self):
         query = """
-        SELECT mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email
+        SELECT mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email
         FROM sinh_vien
         WHERE trang_thai = 1
         """
@@ -14,10 +14,10 @@ class SinhVienModels:
 
     def select_by(self, keyword):
         query = """
-        SELECT mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email
+        SELECT mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email
         FROM sinh_vien
         WHERE trang_thai = 1 AND (
-            mssv LIKE %s OR ho_ten LIKE %s OR lop LIKE %s OR khoa LIKE %s OR email LIKE %s
+            mssv LIKE %s OR ho_ten LIKE %s OR he_dao_tao LIKE %s OR khoa LIKE %s OR email LIKE %s
         )
         """
         like_kw = f"%{keyword}%"
@@ -28,30 +28,31 @@ class SinhVienModels:
         result = self.db.execute_query(query, (mssv,))
         return result[0] if result else None
 
-    def insert(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
+    def insert(self, mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email):
         query = """
-        INSERT INTO sinh_vien (mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email, trang_thai)
+        INSERT INTO sinh_vien (mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email, trang_thai)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 1)
         """
-        return self.db.execute_commit(query, (mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email))
+        return self.db.execute_commit(query, (mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email))
 
-    def update(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
+    def update(self, mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email):
         query = """
         UPDATE sinh_vien
-        SET ho_ten = %s, lop = %s, khoa = %s, ngay_sinh = %s, gioi_tinh = %s, que = %s, email = %s
+        SET ho_ten = %s, he_dao_tao = %s, khoa = %s, ngay_sinh = %s, gioi_tinh = %s, que = %s, email = %s
         WHERE mssv = %s
         """
-        return self.db.execute_commit(query, (ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email, mssv))
+        return self.db.execute_commit(query, (ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email, mssv))
 
     def delete(self, mssv):
         query = "UPDATE sinh_vien SET trang_thai = 0 WHERE mssv = %s"
         return self.db.execute_commit(query, (mssv,))
 
-    def restore(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
+    def restore(self, mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email):
         query = """
         UPDATE sinh_vien
-        SET ho_ten = %s, lop = %s, khoa = %s, ngay_sinh = %s, gioi_tinh = %s,
+        SET ho_ten = %s, he_dao_tao = %s, khoa = %s, ngay_sinh = %s, gioi_tinh = %s,
             que = %s, email = %s, trang_thai = 1
         WHERE mssv = %s
         """
-        return self.db.execute_commit(query, (ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email, mssv))
+        return self.db.execute_commit(query, (ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email, mssv))
+

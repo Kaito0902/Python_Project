@@ -27,7 +27,15 @@ class LopModels:
         return self.db.execute_query(query, (ma_lop,))
     
     def get_by_ma_lop(self, ma_lop):
-        query = "SELECT * FROM lop WHERE ma_lop = %s"
+        query = """
+        SELECT l.*, mh.ten_mon, 
+            COALESCE(gv.ho_ten, 'Chưa phân công') AS ho_ten,
+            gv.trang_thai AS gv_trang_thai
+        FROM lop l
+        JOIN mon_hoc mh ON l.ma_mon = mh.ma_mon
+        LEFT JOIN giang_vien gv ON l.ma_gv = gv.ma_gv
+        WHERE l.ma_lop = %s
+        """
         result = self.db.execute_query(query, (ma_lop,))
         return result[0] if result else None
     
@@ -43,13 +51,12 @@ class LopModels:
         """
         return self.db.execute_commit(query, (ma_lop, ma_mon, so_luong, hoc_ky, nam, ma_gv))
 
-    def update(self, ma_lop, ma_mon, so_luong, hoc_ky, nam, ma_gv):
+    def update(self, ma_lop, ma_mon, so_luong, hoc_ky, nam):
         query = """
         UPDATE lop
-        SET ma_mon = %s, so_luong = %s, hoc_ky = %s, nam = %s, ma_gv = %s
         WHERE ma_lop = %s
         """
-        return self.db.execute_commit(query, (ma_mon, so_luong, hoc_ky, nam, ma_gv, ma_lop))
+        return self.db.execute_commit(query, (ma_mon, so_luong, hoc_ky, nam, ma_lop))
 
     def delete(self, ma_lop):
         query = "UPDATE lop SET trang_thai = 0 WHERE ma_lop = %s"
@@ -84,7 +91,22 @@ class LopModels:
     def huy_dang_ky(self, mssv, ma_lop):
         query = "DELETE FROM dang_ky WHERE mssv = %s AND ma_lop = %s"
         return self.db.execute_commit(query, (mssv, ma_lop))
-    
+
+    def danh_sach_gv_theo_khoa(self, ma_lop):
+        query = """
+        SELECT gv.*
+        FROM giang_vien gv
+        JOIN khoa k ON gv.khoa = k.ma_khoa
+        WHERE gv.trang_thai = 1
+        AND gv.khoa = (
+            SELECT mh.khoa
+            FROM lop l
+            JOIN mon_hoc mh ON l.ma_mon = mh.ma_mon
+            WHERE l.ma_lop = %s
+        )
+        """
+        return self.db.execute_query(query, (ma_lop,))
+
     def phan_cong_giang_vien(self, ma_lop, ma_gv):
         query = "UPDATE lop SET ma_gv = %s WHERE ma_lop = %s"
         return self.db.execute_commit(query, (ma_gv, ma_lop))

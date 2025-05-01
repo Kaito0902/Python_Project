@@ -42,16 +42,16 @@ class ChiTietLopAdminFrame(ctk.CTkFrame):
         detail_frame.pack(padx=20, pady=10)
         
         self.label_lop = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_lop.grid(row=0, column=0, padx=40)
+        self.label_lop.grid(row=0, column=0, padx=20)
 
         self.label_mon = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_mon.grid(row=0, column=1, padx=40)
+        self.label_mon.grid(row=0, column=1, padx=20)
 
         self.label_gv = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_gv.grid(row=0, column=2, padx=40)
+        self.label_gv.grid(row=0, column=2, padx=20)
 
         self.label_sl = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_sl.grid(row=0, column=3, padx=40)
+        self.label_sl.grid(row=0, column=3, padx=20)
 
         style = ttk.Style()
         style.configure("Treeview",
@@ -133,13 +133,13 @@ class ChiTietLopAdminFrame(ctk.CTkFrame):
             messagebox.showwarning("Lỗi", f"Không tìm thấy thông tin lớp học với mã {ma_lop}.")
             return
 
-        self.label_lop.configure(text=f"Lớp: {lop.get('ma_lop', '')}")
-        self.label_mon.configure(text=f"Môn: {lop.get('ma_mon', '')}")
+        self.label_lop.configure(text=f"Lớp : {lop.get('ma_lop', '')}")
+        self.label_mon.configure(text=f"Môn Học : {lop.get('ten_mon', '')}")
 
-        ma_gv = lop.get("ma_gv")
-        self.label_gv.configure(text=f"Giảng viên: {ma_gv if ma_gv else 'Chưa phân công'}")
-
-        self.label_sl.configure(text=f"Số lượng sinh viên: {lop.get('so_luong', 0)}")
+        ten_gv = lop.get("ho_ten")
+        self.label_gv.configure(text=f"Giảng viên: {ten_gv if ten_gv else 'Chưa phân công'}")
+        
+        self.label_sl.configure(text=f"Số lượng sinh viên : {lop.get('so_luong', 0)}")
 
         self.update_treeview()
 

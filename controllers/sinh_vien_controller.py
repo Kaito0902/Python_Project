@@ -12,24 +12,24 @@ class SinhVienController:
             print(f"Lỗi khi lấy danh sách sinh viên: {e}")
             return []
         
-    def add_student_db(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
+    def add_student_db(self, mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email):
         try:
             existing_sv = self.model.get_by_mssv(mssv)
             if existing_sv:
                 if existing_sv['trang_thai'] == 0:
-                    return self.model.restore(mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email)
+                    return self.model.restore(mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email)
                 else:
                     print("Sinh viên đã tồn tại và đang hoạt động.")
                     return False
             else:
-                return self.model.insert(mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email)
+                return self.model.insert(mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email)
         except Exception as e:
             print(f"Lỗi khi thêm sinh viên: {e}")
             return False
         
-    def update_student_db(self, mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email):
+    def update_student_db(self, mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email):
         try:
-            return self.model.update(mssv, ho_ten, lop, khoa, ngay_sinh, gioi_tinh, que, email)
+            return self.model.update(mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email)
         except Exception as e:
             print(f"Lỗi khi cập nhật sinh viên: {e}")
             return False
@@ -48,3 +48,10 @@ class SinhVienController:
             print(f"Lỗi khi tìm kiếm sinh viên: {e}")
             return []
 
+    def get_students_from_khoa(self, khoa):
+        try:
+            result = self.model.select_all()
+            return [sv for sv in result if sv.get("khoa", "").strip() == khoa]
+        except Exception as e:
+            print(f"Lỗi khi lấy danh sách sinh viên: {e}")
+            return []

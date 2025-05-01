@@ -22,12 +22,12 @@ class LopController:
         except Exception as e:
             return False, f"Lỗi khi thêm lớp học: {str(e)}"
     
-    def update_class(self, ma_lop, ma_mon, so_luong, hoc_ky, nam, ma_gv):
+    def update_class(self, ma_lop, ma_mon, so_luong, hoc_ky, nam):
         try:
             if not self.lop_models.is_valid_mon(ma_mon):
                 return False, "Môn học không tồn tại hoặc đã bị xóa."
             
-            updated = self.lop_models.update(ma_lop, ma_mon, so_luong, hoc_ky, nam, ma_gv)
+            updated = self.lop_models.update(ma_lop, ma_mon, so_luong, hoc_ky, nam)
             return (updated, "Cập nhật lớp học thành công.") if updated else (False, "Không thể cập nhật lớp học.")
         except Exception as e:
             return False, f"Lỗi khi cập nhật lớp học: {str(e)}"
@@ -100,6 +100,13 @@ class LopController:
         except Exception as e:
             print(f"Lỗi khi hủy đăng ký sinh viên khỏi lớp: {e}")
             return False
+
+    def danh_sach_gv(self, ma_lop):
+            try:
+                return self.lop_models.danh_sach_gv_theo_khoa(ma_lop)
+            except Exception as e:
+                print(f"Lỗi khi lấy danh sách giảng viên: {e}")
+                return False
         
     def phan_cong_gv(self, ma_lop, ma_gv):
         try:

@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
+from datetime import datetime
 from controllers.lop_controller import LopController
+from controllers.mon_hoc_controller import MonHocController
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
@@ -10,6 +12,7 @@ class ThemLopHoc(ctk.CTkToplevel):
         super().__init__(parent)
         self.parent = parent
         self.controller = controller
+        self.mon_hoc_controller = MonHocController()
         self.title("Thêm Lớp Học")
         self.geometry("500x300")
         self.configure(bg="#f5f5f5")
@@ -43,15 +46,29 @@ class ThemLopHoc(ctk.CTkToplevel):
         label = ctk.CTkLabel(frame, text=label_text, width=80, anchor="w")
         label.pack(side="left", padx=10)
 
-        if entry_attr == "hoc_ky_entry":
-            entry = ttk.Combobox(frame, values=["1", "2", "3"], state="readonly", width=28)
-            entry.set("1") 
-        else:
-            entry = ctk.CTkEntry(frame, width=300)
+        if entry_attr == "ma_mon_entry":
+            mon_list = [mon_hoc["ma_mon"] for mon_hoc in (self.mon_hoc_controller.select_all())]
+            entry = ttk.Combobox(frame, values=mon_list, state="readonly", width=45)
+            entry.set("Chọn-")
+
+        else : 
+            if entry_attr == "hoc_ky_entry":
+                entry = ctk.CTkComboBox(frame, values=["1", "2", "3"], state="readonly", width=300)
+                entry.set("Chọn-")
+            else : 
+                if entry_attr == "nam_entry":
+                    entry = ctk.CTkComboBox(frame, values=self.get_recent_years(4), state="readonly", width=300)
+                    entry.set("Chọn-")
+
+                else : entry = ctk.CTkEntry(frame, width=300)
 
         entry.pack(side="left", padx=10)
 
         setattr(self, entry_attr, entry)
+
+    def get_recent_years(self,n):
+        current_year = datetime.now().year
+        return [str(current_year + i) for i in range(n)]
 
     def xac_nhan(self):
         ma_lop = self.ma_lop_entry.get().strip()
@@ -66,21 +83,9 @@ class ThemLopHoc(ctk.CTkToplevel):
             self.attributes('-topmost', True)
             return
 
-        if not hoc_ky.isdigit() or int(hoc_ky) not in [1, 2, 3]:
-            self.attributes('-topmost', False)
-            messagebox.showerror("Lỗi", "Học kỳ phải là 1, 2 hoặc 3")
-            self.attributes('-topmost', True)
-            return
-
         if not so_luong.isdigit() or int(so_luong) <= 0:
             self.attributes('-topmost', False)
             messagebox.showerror("Lỗi", "Số lượng sinh viên phải là số nguyên dương!")
-            self.attributes('-topmost', True)
-            return
-        
-        if not nam.isdigit() or int(nam) <= 0:
-            self.attributes('-topmost', False)
-            messagebox.showerror("Lỗi", "Năm học phải là số nguyên dương!")
             self.attributes('-topmost', True)
             return
 
