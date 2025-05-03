@@ -12,7 +12,7 @@ class Database:
                 host="localhost",
                 user="root",
                 password="",
-                database="qldsv"
+                database="qldsvien"
             )
             self.cursor = self.conn.cursor(dictionary=True)
             print("✅ Kết nối database thành công!")

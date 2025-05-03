@@ -55,4 +55,3 @@ class SinhVienModels:
         WHERE mssv = %s
         """
         return self.db.execute_commit(query, (ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email, mssv))
-

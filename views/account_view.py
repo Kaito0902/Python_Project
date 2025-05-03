@@ -49,7 +49,7 @@ class AccountManager(ctk.CTkFrame):
         self.search_entry.bind("<KeyRelease>", self.search_user)
 
         icon = ctk.CTkImage(
-            Image.open(r"G:\python\Python_Project\resources\images\search.png").resize(
+            Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize(
                 (20, 20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
                                    hover_color="#ffffff", command=None)

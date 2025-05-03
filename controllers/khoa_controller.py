@@ -50,6 +50,13 @@ class KhoaController:
             print(f"Lỗi khi tìm kiếm khoa: {e}")
             return None
 
+    def select_by_name(self):
+        try:
+            return self.khoa_models.select_by_name()
+        except Exception as e:
+            print(f"Lỗi khi lấy danh sách khoa: {e}")
+            return None
+
     def check_exists(self, ma_khoa):
         try:
             return self.khoa_models.check_exists(ma_khoa)

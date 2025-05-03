@@ -1,7 +1,8 @@
 from models.sinh_vien import SinhVienModels
 
+
 class SinhVienController:
-    
+
     def __init__(self):
         self.model = SinhVienModels()
 
@@ -11,7 +12,7 @@ class SinhVienController:
         except Exception as e:
             print(f"Lỗi khi lấy danh sách sinh viên: {e}")
             return []
-        
+
     def add_student_db(self, mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email):
         try:
             existing_sv = self.model.get_by_mssv(mssv)
@@ -26,7 +27,7 @@ class SinhVienController:
         except Exception as e:
             print(f"Lỗi khi thêm sinh viên: {e}")
             return False
-        
+
     def update_student_db(self, mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email):
         try:
             return self.model.update(mssv, ho_ten, he_dao_tao, khoa, ngay_sinh, gioi_tinh, que, email)

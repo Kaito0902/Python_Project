@@ -53,6 +53,7 @@ class ThemMonHocWindow(ctk.CTkToplevel):
 
         self.khoa_combobox = ctk.CTkComboBox(frame, width=300, values=[])  # ban đầu chưa có dữ liệu
         self.khoa_combobox.pack(side="left", padx=10)
+        self.khoa_combobox.set("Chọn-")
 
     def load_khoa_options(self):
         khoa_list = self.khoacontroller.select_all()

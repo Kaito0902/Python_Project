@@ -99,12 +99,18 @@ class CauHinhDiemFrame(ctk.CTkFrame):
             messagebox.showwarning("Cảnh báo", "Vui lòng chọn một cột điểm để xóa!")
             return
 
-        values = self.tree.item(selected_item,"values")
-        ten_cot_diem = values[1]  # Cột thứ 3 là "Tên Cột Điểm"
+        values = self.tree.item(selected_item, "values")
+        ten_cot_diem = values[1]  # Cột thứ 2 là "Tên Cột Điểm"
         item_id = self.tree.selection()[0]
         selected_data = self.item_data_map.get(item_id)
-        self.controller.delete(selected_data["id"])
-        self.load_data()
-        self.bang_diem_instance.refresh_columns_and_data()
 
-        messagebox.showinfo("Thành công", f"Đã xóa cột điểm: {ten_cot_diem}")
+        confirm = messagebox.askyesno(
+            "Xác nhận xóa",
+            f"Bạn có chắc chắn muốn xóa cột điểm '{ten_cot_diem}' không?"
+        )
+
+        if confirm:
+            self.controller.delete(selected_data["id"])
+            self.load_data()
+            self.bang_diem_instance.refresh_columns_and_data()
+            messagebox.showinfo("Thành công", f"Đã xóa cột điểm: {ten_cot_diem}")

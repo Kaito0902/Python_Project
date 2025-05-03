@@ -32,7 +32,7 @@ class KhoaFrame(ctk.CTkFrame):
         self.search_entry.pack(side="left", padx=10, pady=20)
         self.search_entry.bind("<KeyRelease>", self.tim_kiem_khoa)
 
-        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize(
+        icon = ctk.CTkImage(Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize(
                 (20, 20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
                                    hover_color="#ffffff", command=None)
@@ -91,8 +91,8 @@ class KhoaFrame(ctk.CTkFrame):
         for khoa in khoa_list:
             ma_khoa = khoa.get("ma_khoa", "")
             ten_khoa = khoa.get("ten_khoa", "")
-            so_dien_thoai = khoa.get("so_dien_thoai", "")
-            email = khoa.get("email", "")
+            so_dien_thoai = khoa.get("sdt_khoa", "")
+            email = khoa.get("email_khoa", "")
             self.tree.insert("", "end", values=(ma_khoa, ten_khoa, so_dien_thoai, email))
 
     def load_data(self):

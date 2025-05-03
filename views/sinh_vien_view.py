@@ -24,7 +24,8 @@ class StudentFrame(ctk.CTkFrame):
         header_frame = ctk.CTkFrame(content_frame, fg_color="#646765", height=100)
         header_frame.pack(fill="x")
 
-        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Sinh Viên", font=("Verdana", 18, "bold"), text_color="#ffffff")
+        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Sinh Viên", font=("Verdana", 18, "bold"),
+                                   text_color="#ffffff")
         label_title.pack(pady=20)
 
         # Top Form
@@ -53,17 +54,22 @@ class StudentFrame(ctk.CTkFrame):
         label_hometown.grid(row=3, column=3, padx=5, pady=5)
         label_email.grid(row=4, column=3, padx=5, pady=5)
 
-        self.entry_mssv = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
-        self.entry_name = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_mssv = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white",
+                                       text_color="black")
+        self.entry_name = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white",
+                                       text_color="black")
         self.combo_hdt = ttk.Combobox(form_frame, values=["Đại trà", "CLC"], state="readonly", width=20)
-        
+
         khoa_list = [khoa["ten_khoa"] for khoa in (self.khoa_controller.select_by_name())]
         self.combo_khoa = ttk.Combobox(form_frame, values=khoa_list, state="readonly", width=20)
 
-        self.entry_birth = DateEntry(form_frame, width=15, background='darkblue', foreground='white', borderwidth=2, date_pattern='yyyy-mm-dd')
+        self.entry_birth = DateEntry(form_frame, width=15, background='darkblue', foreground='white', borderwidth=2,
+                                     date_pattern='yyyy-mm-dd')
         self.combo_gender = ttk.Combobox(form_frame, values=["Nam", "Nữ"], state="readonly", width=20)
-        self.entry_hometown = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
-        self.entry_email = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_hometown = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white",
+                                           text_color="black")
+        self.entry_email = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white",
+                                        text_color="black")
 
         self.entry_mssv.grid(row=1, column=2, padx=5, pady=5, sticky="w")
         self.entry_name.grid(row=2, column=2, padx=5, pady=5, sticky="w")
@@ -79,19 +85,24 @@ class StudentFrame(ctk.CTkFrame):
         search_frame.pack(side="right", fill="both", expand=True, padx=20, pady=5)
 
         ctk.CTkLabel(search_frame, text="Tìm kiếm", font=("Verdana", 16, "bold")).grid(row=0, column=0, sticky="ew")
-        self.entry_search = ctk.CTkEntry(search_frame,placeholder_text="Tìm kiếm...", width=200, height=30, border_width=1, fg_color="white", text_color="black")
+        self.entry_search = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=200, height=30,
+                                         border_width=1, fg_color="white", text_color="black")
         self.entry_search.grid(row=1, column=0, pady=5)
 
-        icon = ctk.CTkImage(Image.open(r"resources\images\search.png").resize((20,20)), size=(20, 20))
-        ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=self.search_student).grid(row=1, column=1, pady=5)
+        icon = ctk.CTkImage(Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\search.png").resize((20, 20)), size=(20, 20))
+        ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff",
+                      command=self.search_student).grid(row=1, column=1, pady=5)
 
         # Nút chức năng
         button_frame = ctk.CTkFrame(content_frame, fg_color="#ffffff")
         button_frame.pack(pady=10)
 
-        ctk.CTkButton(button_frame, text="Thêm", font=("Verdana", 13, "bold"), command=self.add_student, fg_color="#4CAF50", text_color="white", width=100).pack(side="left", padx=5)
-        ctk.CTkButton(button_frame, text="Sửa", font=("Verdana", 13, "bold"), command=self.update_student, fg_color="#fbbc0e", text_color="white", width=100).pack(side="left", padx=5)
-        ctk.CTkButton(button_frame, text="Xóa", font=("Verdana", 13, "bold"), command=self.delete_student, fg_color="#F44336", text_color="white", width=100).pack(side="left", padx=5)
+        ctk.CTkButton(button_frame, text="Thêm", font=("Verdana", 13, "bold"), command=self.add_student,
+                      fg_color="#4CAF50", text_color="white", width=100).pack(side="left", padx=5)
+        ctk.CTkButton(button_frame, text="Sửa", font=("Verdana", 13, "bold"), command=self.update_student,
+                      fg_color="#fbbc0e", text_color="white", width=100).pack(side="left", padx=5)
+        ctk.CTkButton(button_frame, text="Xóa", font=("Verdana", 13, "bold"), command=self.delete_student,
+                      fg_color="#F44336", text_color="white", width=100).pack(side="left", padx=5)
 
         # Treeview
         style = ttk.Style()
@@ -102,7 +113,9 @@ class StudentFrame(ctk.CTkFrame):
         tree_frame = ctk.CTkFrame(content_frame, fg_color="white")
         tree_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        self.tree = ttk.Treeview(tree_frame, columns=("MSSV", "Họ Tên", "Hệ Đào Tạo", "Khoa", "Ngày Sinh", "Giới Tính", "Quê", "Email"), show="headings", style="Treeview")
+        self.tree = ttk.Treeview(tree_frame, columns=(
+        "MSSV", "Họ Tên", "Hệ Đào Tạo", "Khoa", "Ngày Sinh", "Giới Tính", "Quê", "Email"), show="headings",
+                                 style="Treeview")
 
         self.tree.heading("MSSV", text="MSSV")
         self.tree.heading("Họ Tên", text="Họ Tên")
@@ -232,7 +245,8 @@ class StudentFrame(ctk.CTkFrame):
             return
         for sv in students:
             self.tree.insert("", "end", values=(
-                sv["mssv"], sv["ho_ten"], sv["he_dao_tao"], sv["khoa"], sv["ngay_sinh"], sv["gioi_tinh"], sv["que"], sv["email"]
+                sv["mssv"], sv["ho_ten"], sv["he_dao_tao"], sv["khoa"], sv["ngay_sinh"], sv["gioi_tinh"], sv["que"],
+                sv["email"]
             ))
 
     def on_treeview_select(self, event):

@@ -1,5 +1,6 @@
 from models.database import Database
 
+
 class KhoaModels:
     def __init__(self):
         self.db = Database()
@@ -13,11 +14,11 @@ class KhoaModels:
         return self.db.execute_query(query, (keyword, f"%{keyword}%"))
 
     def insert(self, ma_khoa, ten_khoa, so_dien_thoai, email):
-        query = "INSERT INTO khoa (ma_khoa, ten_khoa, so_dien_thoai, email, trang_thai) VALUES (%s, %s, %s, %s, 1)"
+        query = "INSERT INTO khoa (ma_khoa, ten_khoa, sdt_khoa, email_khoa, trang_thai) VALUES (%s, %s, %s, %s, 1)"
         return self.db.execute_commit(query, (ma_khoa, ten_khoa, so_dien_thoai, email))
 
     def update(self, ma_khoa, ten_khoa, so_dien_thoai, email):
-        query = "UPDATE khoa SET ten_khoa = %s, so_dien_thoai = %s, email = %s WHERE ma_khoa = %s"
+        query = "UPDATE khoa SET ten_khoa = %s, sdt_khoa = %s, email_khoa = %s WHERE ma_khoa = %s"
         return self.db.execute_commit(query, (ten_khoa, so_dien_thoai, email, ma_khoa))
 
     def delete(self, ma_khoa):
@@ -29,6 +30,10 @@ class KhoaModels:
         result = self.db.execute_query(query, (ma_khoa,))
         if result and len(result) > 0:
             return result[0]
+
+    def select_by_name(self):
+        query = "SELECT ten_khoa FROM khoa WHERE trang_thai = 1"
+        return self.db.execute_query(query)
 
     def check_exists(self, ma_khoa):
         query = "SELECT COUNT(*) FROM khoa WHERE ma_khoa = %s"

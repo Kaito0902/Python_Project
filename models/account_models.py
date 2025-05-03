@@ -41,8 +41,6 @@ class AccountModels:
         query = "DELETE FROM tai_khoan WHERE ma_nguoi_dung = %s"
         self.db.execute_query(query, (ma_nguoi_dung,), commit=True)
 
-    
-
     def log_action(self, ma_nguoi_dung, hanh_dong):
         """Ghi lại hành động của người dùng vào nhật ký"""
         conn = self.db.connect()

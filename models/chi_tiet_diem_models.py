@@ -15,9 +15,37 @@ class ChiTietDiemModels:
         """
         return self.db.execute_query(query, (ma_lop,))
 
-    def insert(self, id, mssv, id_cot_diem, diem):
-        query = "INSERT INTO chi_tiet_diem (id, mssv, id_cot_diem, diem) VALUES (%s, %s, %s, %f)"
-        return self.db.execute_commit(query, (id, mssv, id_cot_diem, diem))
+    def get_by_mssv_and_column(self, ma_lop, mssv, ten_cot_diem):
+        query = """
+        SELECT ctd.*
+        FROM chi_tiet_diem ctd
+        JOIN cau_hinh_diem chd ON ctd.id_cot_diem = chd.id
+        WHERE ctd.ma_lop = %s AND ctd.mssv = %s AND chd.ten_cot_diem = %s
+        """
+        return self.db.execute_query(query, (ma_lop, mssv, ten_cot_diem), fetch_one=True)
+
+    def update(self, ma_lop, mssv, ten_cot_diem, diem):
+        query = """
+        UPDATE chi_tiet_diem ctd
+        JOIN cau_hinh_diem chd ON ctd.id_cot_diem = chd.id
+        SET ctd.diem = %s
+        WHERE ctd.ma_lop = %s AND ctd.mssv = %s AND chd.ten_cot_diem = %s
+        """
+        self.db.execute_query(query, (diem, ma_lop, mssv, ten_cot_diem))
+
+    def insert(self, ma_lop, mssv, ten_cot_diem, diem):
+        # Lấy id_cot_diem từ tên cột điểm
+        query = "SELECT id FROM cau_hinh_diem WHERE ma_lop = %s AND ten_cot_diem = %s"
+        id_cot_diem = self.db.execute_query(query, (ma_lop, ten_cot_diem), fetch_one=True)
+
+        if not id_cot_diem:
+            raise Exception(f"Cột điểm '{ten_cot_diem}' không tồn tại trong cấu hình điểm")
+
+        query = """
+        INSERT INTO chi_tiet_diem (ma_lop, mssv, id_cot_diem, diem)
+        VALUES (%s, %s, %s, %s)
+        """
+        self.db.execute_query(query, (ma_lop, mssv, id_cot_diem["id"], diem))
 
     def update(self, id, mssv, id_cot_diem, diem):
         query = """
