@@ -39,7 +39,7 @@ class MainView(ctk.CTk):
         self.menu_frame.pack(side="left", fill="y")
 
         # Logo
-        image = Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\logo.png").resize((200, 200))
+        image = Image.open(r"G:\python\Python_Project\resources\images\logo.png").resize((200, 200))
         photo = ctk.CTkImage(light_image=image, size=(100, 100))
         img_label = ctk.CTkLabel(self.menu_frame, image=photo, text="", fg_color="#ffffff")
         img_label.grid(row=0, column=0, pady=15)
