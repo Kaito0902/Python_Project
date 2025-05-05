@@ -15,8 +15,9 @@ class SuaGiangVienWindow(ctk.CTkToplevel):
         self.controller = controller
         self.khoacontroller = KhoaController()
         self.title("Sửa Giảng Viên")
-        self.geometry("500x300")
+        self.geometry("500x280")
         self.configure(bg="#f5f5f5")
+        self.center_window(500, 280)
 
         self.attributes('-topmost', True)
 
@@ -34,6 +35,13 @@ class SuaGiangVienWindow(ctk.CTkToplevel):
 
         self.load_khoa_options()
         self.load_selected_item()
+
+    def center_window(self, width, height):
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2 - 40 
+        self.geometry(f"{width}x{height}+{x}+{y}")
 
     def create_input_row(self, label_text, entry_attr):
         frame = ctk.CTkFrame(self, fg_color="white")

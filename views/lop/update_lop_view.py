@@ -8,9 +8,10 @@ ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
 class UpdateLopHoc(ctk.CTkToplevel):
-    def __init__(self, parent, controller: LopController):
+    def __init__(self, parent, controller: LopController, editable: bool = True):
         super().__init__(parent)
         self.parent = parent
+        self.editable = editable
         self.controller = controller
         self.mon_hoc_controller = MonHocController()
         self.title("Cập Nhập Thông Tin Lớp Học")
@@ -30,8 +31,10 @@ class UpdateLopHoc(ctk.CTkToplevel):
         button_frame.pack(pady=10, fill="x")
 
         ctk.CTkButton(button_frame, text="Hủy", font=("Verdana", 14, "bold"), text_color="#7b7d7d", fg_color="white", border_color="#3084ee", border_width=1, hover_color="#d5ebf5", command=self.destroy).pack(side="left", padx=10, pady=5)
-        ctk.CTkButton(button_frame, text="Lưu", font=("Verdana", 14, "bold"), command=self.xac_nhan).pack(side="right", padx=10, pady=5)
-
+        
+        self.save_button = ctk.CTkButton(button_frame, text="Lưu", font=("Verdana", 14, "bold"), command=self.xac_nhan)
+        self.save_button.pack(side="right", padx=10, pady=5)
+        
     def center_window(self, width, height):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -83,25 +86,9 @@ class UpdateLopHoc(ctk.CTkToplevel):
             self.attributes('-topmost', True)
             return
 
-        if not hoc_ky.isdigit() or int(hoc_ky) not in [1, 2, 3]:
-            messagebox.showerror("Lỗi", "Học kỳ phải là 1, 2 hoặc 3")
-            return
-
         if not so_luong.isdigit() or int(so_luong) <= 0:
             self.attributes('-topmost', False)
             messagebox.showerror("Lỗi", "Số lượng sinh viên phải là số nguyên dương!")
-            self.attributes('-topmost', True)
-            return
-
-        if not nam.isdigit() or int(nam) <= 0:
-            self.attributes('-topmost', False)
-            messagebox.showerror("Lỗi", "Năm học phải là số nguyên dương!")
-            self.attributes('-topmost', True)
-            return
-
-        if not self.controller.lop_models.is_valid_mon(ma_mon):
-            self.attributes('-topmost', False)
-            messagebox.showerror("Lỗi", "Môn học không tồn tại hoặc đã bị xóa.")
             self.attributes('-topmost', True)
             return
 
@@ -120,10 +107,19 @@ class UpdateLopHoc(ctk.CTkToplevel):
             messagebox.showerror("Lỗi", f"Lỗi khi cập nhật lớp học: {str(e)}")
             self.attributes('-topmost', True)
 
-    def set_data(self, ma_lop, ma_mon, so_luong, hoc_ky, nam, ma_gv):
+    def set_data(self, ma_lop, ten_mon, ma_mon, so_luong, hoc_ky, nam, ma_gv):
         self.ma_lop_entry.insert(0, ma_lop)
         self.ma_lop_entry.configure(state="disabled")
         self.ma_mon_entry.set(str(ma_mon))
         self.so_luong_entry.insert(0, so_luong)
         self.hoc_ky_entry.set(str(hoc_ky))
         self.nam_entry.set(str(nam))
+                
+        if not self.editable:
+            self.no_edit()
+
+    def no_edit(self):
+        for attr in ("ma_mon_entry", "so_luong_entry", "hoc_ky_entry", "nam_entry"):
+            widget = getattr(self, attr)
+            widget.configure(state="disabled")
+        self.save_button.configure(state="disabled")
