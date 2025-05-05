@@ -13,21 +13,30 @@ class DangKySinhVienVaoLopView(ctk.CTkToplevel):
         self.khoa_controller = KhoaController()
         self.ma_lop = ma_lop
         self.title("Đăng ký sinh viên vào lớp")
-        self.geometry("600x450")
+        self.geometry("600x500")
         self.configure(bg="#ffffff")
-        self.center_window(600, 450)
+        self.center_window(600, 500)
 
         self.attributes('-topmost', True)
 
-        frame = ctk.CTkFrame(self, fg_color="white")
-        frame.pack(padx=10, pady=10, fill="x")
+        khoa_frame = ctk.CTkFrame(self, fg_color="white")
+        khoa_frame.pack(padx=10, pady=10, fill="x")
 
-        ctk.CTkLabel(frame, text="Vui lòng chọn Khoa ", font=("Verdana", 14, "bold"), width=80, anchor="w").pack(side="left", padx=10)
+        ctk.CTkLabel(khoa_frame, text="Vui lòng chọn Khoa ", font=("Verdana", 14, "bold"), width=80, anchor="w").pack(side="left", padx=10)
 
         khoa_list = [khoa["ten_khoa"] for khoa in (self.khoa_controller.select_by_name())]
         khoa_list.insert(0, "Tất cả")
-        self.combo_khoa = ctk.CTkComboBox(frame,  values=khoa_list, state="readonly", command=self.chon_khoa, width=300)
+        self.combo_khoa = ctk.CTkComboBox(khoa_frame,  values=khoa_list, state="readonly", command=self.chon_khoa, width=300)
         self.combo_khoa.pack(side="left", padx=10)
+        
+        search_frame = ctk.CTkFrame(self, fg_color="white")
+        search_frame.pack(padx=10, pady=10, fill="x")
+
+        ctk.CTkLabel(search_frame, text="Nhập Mã hoặc Tên ", font=("Verdana", 14, "bold"), width=85, anchor="w").pack(side="left", padx=10)
+
+        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
+        self.search_entry.pack(side="left", padx=10)
+        self.search_entry.bind("<Return>", self.search)
 
         style = ttk.Style()
         style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
@@ -130,3 +139,7 @@ class DangKySinhVienVaoLopView(ctk.CTkToplevel):
 
             self.tree.insert("", "end", values=(index, ma_sv, ho_ten))
 
+    def search(self, event=None):
+        query = self.search_entry.get().lower()
+        results = self.sv_controller.search_student_db(query)
+        self.update_treeview(results)

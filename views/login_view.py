@@ -27,7 +27,7 @@ class LoginView(ctk.CTk):
         frame.pack(fill="both", expand=True)
 
         # Ảnh login
-        image = Image.open(r"G:\python\Python_Project\resources\images\login.jpg")
+        image = Image.open(r"resources\images\login.jpg")
         photo = CTkImage(image, size=(290, 400))
         img_label = ctk.CTkLabel(frame, image=photo, text="")
         img_label.grid(row=0, column=0, padx=0, pady=0)

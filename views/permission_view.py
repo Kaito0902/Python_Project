@@ -11,6 +11,7 @@ class PermissionView(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.controller = PermissionController()
+        self.configure(fg_color="#ffffff")
         self.pack(fill="both", expand=True)
         
         # --- Header Frame ---
@@ -23,22 +24,23 @@ class PermissionView(ctk.CTkFrame):
         label_title.pack(pady=20)
         
         # --- Các nút thao tác ---
-        btn_frame = ctk.CTkFrame(self, fg_color="#D3D3D3")
-        btn_frame.pack(pady=10, padx=20)
+        btn_frame = ctk.CTkFrame(self, fg_color="#ffffff")
+        btn_frame.pack(pady=20, padx=20)
+        
         btn_add_role = ctk.CTkButton(
-            btn_frame, text="Thêm Vai Trò", fg_color="#4CAF50",
+            btn_frame, text="Thêm Vai Trò", font=("Verdana", 13, "bold"), fg_color="#4CAF50",
             text_color="white", command=self.open_add_role_form, width=120
         )
         btn_add_role.grid(row=0, column=0, padx=5)
         
         btn_edit_role = ctk.CTkButton(
-            btn_frame, text="Sửa Vai Trò", fg_color="#FFA500",
+            btn_frame, text="Sửa Vai Trò", font=("Verdana", 13, "bold"), fg_color="#fbbc0e",
             text_color="white", command=self.open_edit_role_form, width=120
         )
         btn_edit_role.grid(row=0, column=1, padx=5)
         
         btn_delete_role = ctk.CTkButton(
-            btn_frame, text="Xóa Vai Trò", fg_color="#F44336",
+            btn_frame, text="Xóa Vai Trò", font=("Verdana", 13, "bold"), fg_color="#F44336",
             text_color="white", command=self.delete_role, width=120
         )
         btn_delete_role.grid(row=0, column=2, padx=5)
@@ -57,9 +59,9 @@ class PermissionView(ctk.CTkFrame):
         for col in columns:
             self.tree.heading(col, text=col)
             if col in ["Xem", "Thêm", "Sửa", "Xóa"]:
-                self.tree.column(col, anchor="center", width=50, minwidth=50, stretch=False)
+                self.tree.column(col, anchor="center", width=70, minwidth=50, stretch=False)
             else:
-                self.tree.column(col, anchor="center", width=200)
+                self.tree.column(col, anchor="center", width=180)
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
         
         self.load_roles()
@@ -99,7 +101,7 @@ class PermissionView(ctk.CTkFrame):
         form_frame.pack(fill="x", padx=20, pady=10)
         
         # --- Nhập tên vai trò ---
-        label_role = ctk.CTkLabel(form_frame, text="Tên Vai Trò:", font=("Arial", 12))
+        label_role = ctk.CTkLabel(form_frame, text="Tên Vai Trò:", font=("Verdana", 13, "bold"))
         label_role.pack(pady=5)
         self.entry_vai_tro = ctk.CTkEntry(form_frame, width=250)
         self.entry_vai_tro.pack(pady=5)
@@ -148,7 +150,7 @@ class PermissionView(ctk.CTkFrame):
         btn_cancel = ctk.CTkButton(btn_frame, fg_color="#F44336", text="Hủy",
                                    text_color="white", command=self.add_window.destroy,
                                    width=150, height=40)
-        btn_add.pack(side="left", expand=True, padx=10)
+        btn_add.pack(side="right", expand=True, padx=10)
         btn_cancel.pack(side="left", expand=True, padx=10)
     
     def add_role(self):
@@ -218,7 +220,7 @@ class PermissionView(ctk.CTkFrame):
         form_frame.pack(fill="x", padx=20, pady=10)
         
         # --- Nhập tên vai trò (pre-populate) ---
-        label_role = ctk.CTkLabel(form_frame, text="Tên Vai Trò:", font=("Arial", 12))
+        label_role = ctk.CTkLabel(form_frame, text="Tên Vai Trò:", font=("Verdana", 13, "bold"))
         label_role.pack(pady=5)
         self.entry_vai_tro = ctk.CTkEntry(form_frame, width=250)
         self.entry_vai_tro.pack(pady=5)
@@ -272,7 +274,7 @@ class PermissionView(ctk.CTkFrame):
         btn_cancel = ctk.CTkButton(btn_frame, fg_color="#F44336", text="Hủy",
                                    text_color="white", command=self.edit_window.destroy,
                                    width=150, height=40)
-        btn_save.pack(side="left", expand=True, padx=10)
+        btn_save.pack(side="right", expand=True, padx=10)
         btn_cancel.pack(side="left", expand=True, padx=10)
     
     def submit_edit_role(self, old_role):
@@ -325,3 +327,4 @@ class PermissionView(ctk.CTkFrame):
             self.load_roles()
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể xóa vai trò: {str(e)}", parent=self)
+

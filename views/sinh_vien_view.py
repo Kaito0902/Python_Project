@@ -58,7 +58,7 @@ class StudentFrame(ctk.CTkFrame):
                                        text_color="black")
         self.entry_name = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white",
                                        text_color="black")
-        self.combo_hdt = ttk.Combobox(form_frame, values=["Đại trà", "CLC"], state="readonly", width=20)
+        self.combo_hdt = ttk.Combobox(form_frame, values=["Chính Quy", "Liên Thông"], state="readonly", width=20)
 
         khoa_list = [khoa["ten_khoa"] for khoa in (self.khoa_controller.select_by_name())]
         self.combo_khoa = ttk.Combobox(form_frame, values=khoa_list, state="readonly", width=20)
@@ -89,7 +89,7 @@ class StudentFrame(ctk.CTkFrame):
                                          border_width=1, fg_color="white", text_color="black")
         self.entry_search.grid(row=1, column=0, pady=5)
 
-        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize((20, 20)), size=(20, 20))
+        icon = ctk.CTkImage(Image.open(r"resources\images\search.png").resize((20, 20)), size=(20, 20))
         ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff",
                       command=self.search_student).grid(row=1, column=1, pady=5)
 

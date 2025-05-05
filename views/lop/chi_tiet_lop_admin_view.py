@@ -3,6 +3,7 @@ from tkinter import filedialog
 import customtkinter as ctk
 from tkinter import messagebox, ttk
 import pandas as pd
+from datetime import datetime
 
 from views.lop.phan_cong_gv_view import PhanCongGvView
 from views.lop.dang_ky_lop_view import DangKySinhVienVaoLopView
@@ -34,24 +35,29 @@ class ChiTietLopAdminFrame(ctk.CTkFrame):
        
         ctk.CTkButton(btn_frame, fg_color="#904fd2", hover_color="#616262", text="◀ Quay lại",  text_color="white", font=("Verdana", 13, "bold"), command=self.back_to_lop_admin, width=80).pack(side="left", padx=5, pady=20)
         ctk.CTkButton(btn_frame, fg_color="#f89924", hover_color="#616262", text="Xuất danh sách ☰",  text_color="white", font=("Verdana", 13, "bold"), command=self.xuat_danh_sach, width=100).pack(side="right", padx=5, pady=20)
-        ctk.CTkButton(btn_frame, fg_color="#539cbd", hover_color="#616262", text="Phân công GV",  text_color="white", font=("Verdana", 13, "bold"), command=self.phan_cong_giang_vien, width=100).pack(side="right", padx=5, pady=20)
-        ctk.CTkButton(btn_frame, fg_color="#f6695e", hover_color="#616262", text="Hủy đăng ký", text_color="white", font=("Verdana", 13, "bold"), command=self.huy_dang_ky, width=100).pack(side="right", padx=5, pady=20)
-        ctk.CTkButton(btn_frame, fg_color="#4CAF50", hover_color="#616262", text="Đăng ký lớp học", text_color="white", font=("Verdana", 13, "bold"), command=self.dang_ky, width=120).pack(side="right", padx=5, pady=20)
+        
+        self.btn_phan_cong = ctk.CTkButton(btn_frame, fg_color="#539cbd", hover_color="#616262", text="Phân công GV",  text_color="white", font=("Verdana", 13, "bold"), command=self.phan_cong_giang_vien, width=100)
+        self.btn_huy_dk   = ctk.CTkButton(btn_frame, fg_color="#f6695e", hover_color="#616262", text="Hủy đăng ký", text_color="white", font=("Verdana", 13, "bold"), command=self.huy_dang_ky, width=100)
+        self.btn_dang_ky  = ctk.CTkButton(btn_frame, fg_color="#4CAF50", hover_color="#616262", text="Đăng ký lớp học", text_color="white", font=("Verdana", 13, "bold"), command=self.dang_ky, width=120)
+
+        self.btn_phan_cong.pack(side="right", padx=5)
+        self.btn_huy_dk.pack(side="right", padx=5)
+        self.btn_dang_ky.pack(side="right", padx=5)
 
         detail_frame = ctk.CTkFrame(content_frame, fg_color="#f2f2f2", corner_radius=30)
         detail_frame.pack(padx=20, pady=10)
         
         self.label_lop = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_lop.grid(row=0, column=0, padx=20)
+        self.label_lop.grid(row=0, column=0, padx=15)
 
         self.label_mon = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_mon.grid(row=0, column=1, padx=20)
+        self.label_mon.grid(row=0, column=1, padx=15)
 
         self.label_gv = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_gv.grid(row=0, column=2, padx=20)
+        self.label_gv.grid(row=0, column=2, padx=15)
 
         self.label_sl = ctk.CTkLabel(detail_frame, text="", font=("Arial", 15, "bold"), text_color="black")
-        self.label_sl.grid(row=0, column=3, padx=20)
+        self.label_sl.grid(row=0, column=3, padx=15)
 
         style = ttk.Style()
         style.configure("Treeview",
@@ -140,6 +146,17 @@ class ChiTietLopAdminFrame(ctk.CTkFrame):
         self.label_gv.configure(text=f"Giảng viên: {ten_gv if ten_gv else 'Chưa phân công'}")
         
         self.label_sl.configure(text=f"Số lượng sinh viên : {lop.get('so_luong', 0)}")
+
+        nam_hoc = int(lop.get("nam", 0))
+        current_year = datetime.now().year
+
+        for btn in (self.btn_dang_ky, self.btn_huy_dk, self.btn_phan_cong):
+            btn.pack_forget()
+
+        if nam_hoc >= current_year:
+            self.btn_phan_cong.pack(side="right", padx=5)
+            self.btn_huy_dk.pack(side="right", padx=5)
+            self.btn_dang_ky.pack(side="right", padx=5)
 
         self.update_treeview()
 

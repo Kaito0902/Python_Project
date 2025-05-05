@@ -44,12 +44,12 @@ class AccountManager(ctk.CTkFrame):
         search_frame = ctk.CTkFrame(self, fg_color="white")
         search_frame.pack(pady=5, padx=20, fill="x")
 
-        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=200)
+        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
         self.search_entry.pack(side="left", padx=10)
         self.search_entry.bind("<KeyRelease>", self.search_user)
 
         icon = ctk.CTkImage(
-            Image.open(r"G:\python\Python_Project\resources\images\search.png").resize(
+            Image.open(r"resources\images\search.png").resize(
                 (20, 20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
                                    hover_color="#ffffff", command=None)
@@ -60,10 +60,10 @@ class AccountManager(ctk.CTkFrame):
         btn_frame.pack(side="right")
 
         # lưu tham chiếu các nút để phân quyền
-        self.btn_add = ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", command=self.add_user, width=80)
-        self.btn_edit = ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", command=self.edit_user, width=80)
-        self.btn_delete = ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", text_color="white", command=self.delete_user, width=80)
-        self.btn_logs = ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", command=self.view_logs, width=80)
+        self.btn_add = ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", text_color="white", font=("Verdana", 13, "bold"), command=self.add_user, width=80)
+        self.btn_edit = ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", text_color="white", font=("Verdana", 13, "bold"), command=self.edit_user, width=80)
+        self.btn_delete = ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", text_color="white", font=("Verdana", 13, "bold"), command=self.delete_user, width=80)
+        self.btn_logs = ctk.CTkButton(btn_frame, fg_color="#904fd2", text="Xem nhật ký", text_color="white", font=("Verdana", 13, "bold"), command=self.view_logs, width=160)
         for w in (self.btn_add, self.btn_edit, self.btn_delete, self.btn_logs):
             w.pack(side="left", padx=5)
         
@@ -88,7 +88,6 @@ class AccountManager(ctk.CTkFrame):
         try:
             self.tree.delete(*self.tree.get_children())  # Xóa toàn bộ Treeview
             self.all_accounts = self.controller.get_all_accounts()  
-            print("Dữ liệu tài khoản:", self.all_accounts)  
 
             for acc in self.all_accounts:
                 self.tree.insert("", "end", values=(acc['ma_nguoi_dung'], acc['username'], acc['password'], acc['vai_tro'])) 
@@ -197,10 +196,10 @@ class AccountManager(ctk.CTkFrame):
 
         btn_add = ctk.CTkButton(btn_frame, text="Thêm", fg_color="#4CAF50",
                                 text_color="white", command=submit)
-        btn_add.pack(side="left", padx=10)
+        btn_add.pack(side="right", padx=10)
         btn_cancel = ctk.CTkButton(btn_frame, text="Hủy bỏ", fg_color="#F44336",
                                 text_color="white", command=self.add_window.destroy)
-        btn_cancel.pack(side="right", padx=10)
+        btn_cancel.pack(side="left", padx=10)
  
     def edit_user(self):
         if current_user.get("vai_tro_id") != "admin":
@@ -312,10 +311,10 @@ class AccountManager(ctk.CTkFrame):
 
         btn_save = ctk.CTkButton(btn_frame, text="Lưu", command=submit_edit,
                                 width=150, fg_color="#4CAF50", text_color="white")
-        btn_save.pack(side="left", padx=10)
+        btn_save.pack(side="right", padx=10)
         btn_cancel = ctk.CTkButton(btn_frame, text="Hủy bỏ", command=self.edit_window.destroy,
                                 width=150, fg_color="#F44336", text_color="white")
-        btn_cancel.pack(side="right", padx=10)
+        btn_cancel.pack(side="left", padx=10)
 
         self.edit_window.lift()
         self.edit_window.attributes('-topmost', True)
@@ -410,7 +409,6 @@ class AccountManager(ctk.CTkFrame):
 
 
 
-
 def validate_user_input(ma, username, password, vai_tro, parent_window):
     """
     Kiểm tra đầu vào: Không để rỗng và chỉ cho phép chữ, số, dấu gạch dưới.
@@ -444,7 +442,6 @@ def validate_user_update(username, password, vai_tro, parent_window):
         messagebox.showwarning("Cảnh báo", "Vai trò chỉ cho phép chữ, số và dấu gạch dưới!", parent=parent_window)
         return False
     return True
-
 
 #if __name__ == "__main__":
     # Giả sử người dùng đã đăng nhập với vai trò admin

@@ -16,7 +16,7 @@ from views.account_view import AccountManager
 from views.permission_view import PermissionView
 from session import current_user
 from controllers.AuthManager import lay_quyen
-from login_view import LoginView
+from views.login_view import LoginView
 
 
 class MainView(ctk.CTk):
@@ -40,7 +40,7 @@ class MainView(ctk.CTk):
         self.menu_frame.pack(side="left", fill="y")
 
         # Logo
-        image = Image.open(r"G:\python\Python_Project\resources\images\logo.png").resize((200, 200))
+        image = Image.open(r"resources\images\logo.png").resize((200, 200))
         photo = ctk.CTkImage(light_image=image, size=(100, 100))
         img_label = ctk.CTkLabel(self.menu_frame, image=photo, text="", fg_color="#ffffff")
         img_label.grid(row=0, column=0, pady=15)
@@ -60,7 +60,7 @@ class MainView(ctk.CTk):
         if self.user_permissions.get("lop_hoc", {}).get("xem"):
             ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classAdmin_frame).grid(row=2, column=0, pady=5)
 
-        ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
+        #ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
         if self.user_permissions.get("mon_hoc", {}).get("xem"):
             ctk.CTkButton(self.menu_frame, text="Môn học", **button_style, command=self.show_subject_frame).grid(row=3, column=0, pady=5)
 
