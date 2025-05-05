@@ -4,7 +4,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 class DigitRecognizer:
-    def __init__(self, model_path=r"G:\python\Python_Project\resources\models_ai\mnist_cnn_finetuned.h5"):
+    def __init__(self, model_path=r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\models_ai\mnist_cnn_finetuned.h5"):
         self.model = tf.keras.models.load_model(model_path)
 
     def preprocess_digit(self, roi):

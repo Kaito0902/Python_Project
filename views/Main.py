@@ -14,6 +14,7 @@ from views.lop.chi_tiet_lop_giangvien_view import ChiTietLopGiangVienFrame
 from views.cau_hinh_diem.QuanLyLopTabbedPane import QuanLyLopTabbedPane
 from views.account_view import AccountManager
 from views.permission_view import PermissionView
+from views.diem.danh_sach_mon import NhapDiemFrame
 from session import current_user
 from controllers.AuthManager import lay_quyen
 from login_view import LoginView
@@ -40,7 +41,7 @@ class MainView(ctk.CTk):
         self.menu_frame.pack(side="left", fill="y")
 
         # Logo
-        image = Image.open(r"G:\python\Python_Project\resources\images\logo.png").resize((200, 200))
+        image = Image.open(r"D:\Downloads\sever nro\icon\Python_Project-master1\resources\images\logo.png").resize((200, 200))
         photo = ctk.CTkImage(light_image=image, size=(100, 100))
         img_label = ctk.CTkLabel(self.menu_frame, image=photo, text="", fg_color="#ffffff")
         img_label.grid(row=0, column=0, pady=15)
@@ -60,7 +61,9 @@ class MainView(ctk.CTk):
         if self.user_permissions.get("lop_hoc", {}).get("xem"):
             ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classAdmin_frame).grid(row=2, column=0, pady=5)
 
-        ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
+        # ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
+        # ctk.CTkButton(self.menu_frame, text="Nhâp điểm cuối kỳ", **button_style, command=self.show_nhap_diem_frame).grid(row=2, column=0, pady=5)
+
         if self.user_permissions.get("mon_hoc", {}).get("xem"):
             ctk.CTkButton(self.menu_frame, text="Môn học", **button_style, command=self.show_subject_frame).grid(row=3, column=0, pady=5)
 
@@ -168,6 +171,13 @@ class MainView(ctk.CTk):
             widget.destroy()
         account_frame = PermissionView(self.main_content)
         account_frame.pack(fill="both", expand=True)
+
+    def show_nhap_diem_frame(self):
+        for widget in self.main_content.winfo_children():
+            widget.destroy()
+
+        nhap_diem_frame = NhapDiemFrame(self.main_content, app=self)
+        nhap_diem_frame.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
     import threading
