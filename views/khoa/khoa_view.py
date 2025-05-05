@@ -4,63 +4,106 @@ from tkinter import ttk, messagebox
 from views.khoa.insert_khoa import ThemKhoaWindow
 from views.khoa.update_khoa import SuaKhoaWindow
 from controllers.khoa_controller import KhoaController
+from session import current_user, current_user_permissions
+from controllers.AuthManager import lay_quyen
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
-
 
 class KhoaFrame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent, corner_radius=15, fg_color="white")
         self.controller = KhoaController()
+        self.user_permissions = lay_quyen(current_user["vai_tro_id"])
+
         self.parent = parent
         self.pack(fill="both", expand=True)
         self.create_widgets()
         self.load_data()
 
     def create_widgets(self):
+        # Header
         header_frame = ctk.CTkFrame(self, fg_color="#646765", height=100)
         header_frame.pack(fill="x")
-
-        label_title = ctk.CTkLabel(header_frame, text="Quản Lý Khoa", font=("Verdana", 18, "bold"), text_color="#ffffff")
+        label_title = ctk.CTkLabel(header_frame,
+                                   text="Quản Lý Khoa",
+                                   font=("Verdana", 18, "bold"),
+                                   text_color="#ffffff")
         label_title.pack(pady=20)
 
+        # Search frame
         search_frame = ctk.CTkFrame(self, fg_color="white")
         search_frame.pack(pady=5, padx=20, fill="x")
 
-        self.search_entry = ctk.CTkEntry(search_frame, placeholder_text="Tìm kiếm...", width=300)
+        self.search_entry = ctk.CTkEntry(search_frame,
+                                         placeholder_text="Tìm kiếm...",
+                                         width=300)
         self.search_entry.pack(side="left", padx=10, pady=20)
         self.search_entry.bind("<KeyRelease>", self.tim_kiem_khoa)
 
-        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize(
-                (20, 20)), size=(20, 20))
-        btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
-                                   hover_color="#ffffff", command=None)
+        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize((20, 20)),
+                           size=(20, 20))
+        btn_search = ctk.CTkButton(search_frame,
+                                   image=icon,
+                                   text="",
+                                   width=20,
+                                   height=20,
+                                   fg_color="#ffffff",
+                                   hover_color="#ffffff",
+                                   command=None)
         btn_search.pack(side="left", pady=20)
 
+        # Nút thao tác: Thêm, Sửa, Xóa chỉ được tạo khi có quyền
         btn_frame = ctk.CTkFrame(search_frame, fg_color="white")
         btn_frame.pack(side="right")
 
-        ctk.CTkButton(btn_frame, fg_color="#4CAF50", text="Thêm", font=("Verdana", 13, "bold"), text_color="white", command=self.them_khoa, width=80).pack(side="left", padx=5,pady=20)
-        ctk.CTkButton(btn_frame, fg_color="#fbbc0e", text="Sửa", font=("Verdana", 13, "bold"), text_color="white", command=self.sua_khoa, width=80).pack(side="left", padx=5,pady=20)
-        ctk.CTkButton(btn_frame, fg_color="#F44336", text="Xóa", font=("Verdana", 13, "bold"),  text_color="white", command=self.xoa_khoa, width=80).pack(side="left", padx=5,pady=20)
+        if self.user_permissions.get("khoa", {}).get("them"):
+            ctk.CTkButton(btn_frame,
+                          fg_color="#4CAF50",
+                          text="Thêm",
+                          font=("Verdana", 13, "bold"),
+                          text_color="white",
+                          command=self.them_khoa,
+                          width=80).pack(side="left", padx=5, pady=20)
+        if self.user_permissions.get("khoa", {}).get("sua"):
+            ctk.CTkButton(btn_frame,
+                          fg_color="#fbbc0e",
+                          text="Sửa",
+                          font=("Verdana", 13, "bold"),
+                          text_color="white",
+                          command=self.sua_khoa,
+                          width=80).pack(side="left", padx=5, pady=20)
+        if self.user_permissions.get("khoa", {}).get("xoa"):
+            ctk.CTkButton(btn_frame,
+                          fg_color="#F44336",
+                          text="Xóa",
+                          font=("Verdana", 13, "bold"),
+                          text_color="white",
+                          command=self.xoa_khoa,
+                          width=80).pack(side="left", padx=5, pady=20)
 
+        # Setup Treeview
         style = ttk.Style()
-        style.configure("Treeview", background="#f5f5f5", foreground="black", rowheight=30, fieldbackground="lightgray")
-        style.configure("Treeview.Heading", font=("Arial", 12, "bold"), background="#3084ee", foreground="black")
-        style.map("Treeview", background=[("selected", "#4CAF50")], foreground=[("selected", "white")])
-
+        style.configure("Treeview",
+                        background="#f5f5f5",
+                        foreground="black",
+                        rowheight=30,
+                        fieldbackground="lightgray")
+        style.configure("Treeview.Heading",
+                        font=("Arial", 12, "bold"),
+                        background="#3084ee",
+                        foreground="black")
+        style.map("Treeview",
+                  background=[("selected", "#4CAF50")],
+                  foreground=[("selected", "white")])
         columns = ("Mã Khoa", "Tên Khoa", "SĐT", "Email")
         self.tree = ttk.Treeview(self, columns=columns, show="headings", style="Treeview")
-
         for col in columns:
             self.tree.heading(col, text=col)
-
         self.tree.column("Mã Khoa", width=80, anchor="center")
         self.tree.column("Tên Khoa", width=150, anchor="center")
         self.tree.column("SĐT", width=100, anchor="center")
         self.tree.column("Email", width=150, anchor="center")
-
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
         self.tree.bind("<ButtonRelease-1>", self.on_row_click)
 

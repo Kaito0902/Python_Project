@@ -21,7 +21,7 @@ class PermissionModel:
             {"vai_tro": row["vai_tro"], "module": row["module"], "xem": row["xem"],
              "them": row["them"], "sua": row["sua"], "xoa": row["xoa"]} for row in data
         ]
-
+    
     def add_role(self, ten_vai_tro):
         """
         Thêm vai trò mới vào bảng `vai_tro` và trả về ID của vai trò vừa thêm.

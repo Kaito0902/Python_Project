@@ -1,6 +1,7 @@
 from models.mon_hoc_models import MonHocModels
 from session import current_user_permissions
 
+
 class MonHocController:
     def __init__(self):
         self.mon_hoc_models = MonHocModels()
