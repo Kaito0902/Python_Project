@@ -11,7 +11,6 @@ class PermissionModel:
         if not data:
             print("❌ Không có dữ liệu quyền hạn!")
             return []
-        print("🔍 Dữ liệu lấy được:", data)
         if isinstance(data[0], tuple):
             return [
                 {"vai_tro": row[0], "module": row[1], "xem": row[2],

@@ -1,4 +1,3 @@
-
 import mysql.connector
 import logging
 class Database:
@@ -11,8 +10,8 @@ class Database:
             self.conn = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",
-                database="test"
+                password="khanh",
+                database="quan_ly_sinh_vien"
             )
             self.cursor = self.conn.cursor(dictionary=True)
             print("✅ Kết nối database thành công!")
