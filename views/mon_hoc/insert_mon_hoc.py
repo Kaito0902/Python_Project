@@ -14,8 +14,9 @@ class ThemMonHocWindow(ctk.CTkToplevel):
         self.controller = controller
         self.khoacontroller = KhoaController()
         self.title("Thêm Môn Học")
-        self.geometry("500x300")
+        self.geometry("500x250")
         self.configure(bg="#f5f5f5")
+        self.center_window(500, 250)
 
         self.attributes('-topmost', True)
 
@@ -31,6 +32,13 @@ class ThemMonHocWindow(ctk.CTkToplevel):
         ctk.CTkButton(button_frame, text="Hủy bỏ", command=self.destroy).pack(side="right", padx=10, pady=5)
 
         self.load_khoa_options()
+
+    def center_window(self, width, height):
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2 - 40 
+        self.geometry(f"{width}x{height}+{x}+{y}")
 
     def create_input_row(self, label_text, entry_attr):
         frame = ctk.CTkFrame(self, fg_color="white")

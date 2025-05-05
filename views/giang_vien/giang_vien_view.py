@@ -35,7 +35,7 @@ class GiangVienFrame(ctk.CTkFrame):
         self.search_entry.pack(side="left", padx=10, pady=20)
         self.search_entry.bind("<KeyRelease>", self.tim_kiem_giang_vien)
 
-        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize(
+        icon = ctk.CTkImage(Image.open(r"resources\images\search.png").resize(
                 (20, 20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff",
                                    hover_color="#ffffff", command=None)
@@ -61,7 +61,7 @@ class GiangVienFrame(ctk.CTkFrame):
             
         self.tree.column("Mã GV", width=60, anchor="center")
         self.tree.column("Tên GV", width=120, anchor="center")
-        self.tree.column("Khoa", width=80, anchor="center")
+        self.tree.column("Khoa", width=80)
         self.tree.column("Email", width=120, anchor="center")
         self.tree.column("SĐT", width=100, anchor="center")
 

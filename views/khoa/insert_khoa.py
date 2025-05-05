@@ -14,6 +14,7 @@ class ThemKhoaWindow(ctk.CTkToplevel):
         self.title("Thêm Khoa")
         self.geometry("400x220")
         self.configure(bg="#f5f5f5")
+        self.center_window(400, 220)
 
         self.attributes('-topmost', True)
 
@@ -27,6 +28,13 @@ class ThemKhoaWindow(ctk.CTkToplevel):
 
         ctk.CTkButton(button_frame, text="Lưu", command=self.luu_khoa).pack(side="left", padx=10, pady=5)
         ctk.CTkButton(button_frame, text="Hủy bỏ", command=self.destroy).pack(side="right", padx=10, pady=5)
+
+    def center_window(self, width, height):
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2 - 40 
+        self.geometry(f"{width}x{height}+{x}+{y}")
 
     def create_input_row(self, label_text, entry_attr):
         frame = ctk.CTkFrame(self, fg_color="white")

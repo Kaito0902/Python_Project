@@ -33,7 +33,7 @@ class MonHocFrame(ctk.CTkFrame):
         self.search_entry.pack(side="left", padx=10, pady=20)
         self.search_entry.bind("<KeyRelease>", self.tim_kiem_mon_hoc)
 
-        icon = ctk.CTkImage(Image.open(r"G:\python\Python_Project\resources\images\search.png").resize((20, 20)), size=(20, 20))
+        icon = ctk.CTkImage(Image.open(r"resources\images\search.png").resize((20, 20)), size=(20, 20))
         btn_search = ctk.CTkButton(search_frame, image=icon, text="", width=20, height=20, fg_color="#ffffff", hover_color="#ffffff", command=None)
         btn_search.pack(side="left", pady=20)
 
@@ -55,10 +55,10 @@ class MonHocFrame(ctk.CTkFrame):
         for col in columns:
             self.tree.heading(col, text=col)
 
-        self.tree.column("Mã Môn", width=80, anchor="center")
-        self.tree.column("Tên Môn", width=180, anchor="center")
-        self.tree.column("Số Tín Chỉ", width=60, anchor="center")
-        self.tree.column("Khoa", width=120, anchor="center")
+        self.tree.column("Mã Môn", width=60, anchor="center")
+        self.tree.column("Tên Môn", width=200)
+        self.tree.column("Số Tín Chỉ", width=40, anchor="center")
+        self.tree.column("Khoa", width=180, anchor="center")
 
 
         self.tree.pack(pady=10, padx=20, fill="both", expand=True)
