@@ -5,7 +5,12 @@ class LopModels:
         self.db = Database()
 
     def select_all(self):
-        query = "SELECT * FROM lop WHERE trang_thai = 1"
+        query = """
+            SELECT lop.*, mon_hoc.ten_mon
+            FROM lop
+            JOIN mon_hoc ON lop.ma_mon = mon_hoc.ma_mon
+            WHERE lop.trang_thai = 1
+        """
         return self.db.execute_query(query)
 
     def select_by(self, keyword):
@@ -54,6 +59,7 @@ class LopModels:
     def update(self, ma_lop, ma_mon, so_luong, hoc_ky, nam):
         query = """
         UPDATE lop
+        SET ma_mon = %s, so_luong = %s, hoc_ky = %s, nam = %s
         WHERE ma_lop = %s
         """
         return self.db.execute_commit(query, (ma_mon, so_luong, hoc_ky, nam, ma_lop))
