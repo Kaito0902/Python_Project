@@ -58,7 +58,7 @@ class StudentFrame(ctk.CTkFrame):
                                        text_color="black")
         self.entry_name = ctk.CTkEntry(form_frame, width=150, height=30, border_width=1, fg_color="white",
                                        text_color="black")
-        self.combo_hdt = ttk.Combobox(form_frame, values=["Đại trà", "CLC"], state="readonly", width=20)
+        self.combo_hdt = ttk.Combobox(form_frame, values=["Chính Quy", "Liên Thông"], state="readonly", width=20)
 
         khoa_list = [khoa["ten_khoa"] for khoa in (self.khoa_controller.select_by_name())]
         self.combo_khoa = ttk.Combobox(form_frame, values=khoa_list, state="readonly", width=20)

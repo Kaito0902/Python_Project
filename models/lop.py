@@ -1,5 +1,6 @@
 from models.database import Database
 
+
 class LopModels:
     def __init__(self):
         self.db = Database()
@@ -21,7 +22,7 @@ class LopModels:
             AND trang_thai = 1
         """
         return self.db.execute_query(query, (like_kw, like_kw, like_kw, like_kw))
-    
+
     def get_students_in_class(self, ma_lop):
         query = """
         SELECT sv.mssv, sv.ho_ten, sv.ngay_sinh, sv.khoa, sv.email
@@ -30,7 +31,7 @@ class LopModels:
         WHERE dk.ma_lop = %s AND sv.trang_thai = 1
         """
         return self.db.execute_query(query, (ma_lop,))
-    
+
     def get_by_ma_lop(self, ma_lop):
         query = """
         SELECT l.*, mh.ten_mon, 
@@ -43,8 +44,8 @@ class LopModels:
         """
         result = self.db.execute_query(query, (ma_lop,))
         return result[0] if result else None
-    
-    def is_valid_mon(self,ma_mon):
+
+    def is_valid_mon(self, ma_mon):
         query = "SELECT * FROM mon_hoc WHERE ma_mon = %s AND trang_thai = 1"
         result = self.db.execute_query(query, (ma_mon,))
         return bool(result)
@@ -93,9 +94,25 @@ class LopModels:
     def register_student_to_class(self, mssv, ma_lop):
         query = "INSERT INTO dang_ky (mssv, ma_lop) VALUES (%s, %s)"
         return self.db.execute_commit(query, (mssv, ma_lop))
-    
+
+    def them(self):
+        query_them = """
+                    INSERT INTO chi_tiet_diem (mssv, id_cot_diem, diem)
+                    SELECT dk.mssv, chd.id, 0
+                    FROM dang_ky dk
+                    JOIN cau_hinh_diem chd ON dk.ma_lop = chd.ma_lop
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM chi_tiet_diem ctd
+                        WHERE ctd.mssv = dk.mssv AND ctd.id_cot_diem = chd.id
+                    );
+                    """
+        return self.db.execute_commit(query_them)
+
     def huy_dang_ky(self, mssv, ma_lop):
         query = "DELETE FROM dang_ky WHERE mssv = %s AND ma_lop = %s"
+        query_delete_diem = "DELETE FROM chi_tiet_diem WHERE mssv = %s"
+        self.db.execute_commit(query_delete_diem, (mssv,))
         return self.db.execute_commit(query, (mssv, ma_lop))
 
     def danh_sach_gv_theo_khoa(self, ma_lop):

@@ -7,6 +7,7 @@ from controllers.mon_hoc_controller import MonHocController
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
+
 class UpdateLopHoc(ctk.CTkToplevel):
     def __init__(self, parent, controller: LopController, editable: bool = True):
         super().__init__(parent)
@@ -26,20 +27,22 @@ class UpdateLopHoc(ctk.CTkToplevel):
         self.create_input_row("Số Lượng SV:", "so_luong_entry")
         self.create_input_row("Học Kỳ:", "hoc_ky_entry")
         self.create_input_row("Năm Học:", "nam_entry")
-        
+
         button_frame = ctk.CTkFrame(self, fg_color="white")
         button_frame.pack(pady=10, fill="x")
 
-        ctk.CTkButton(button_frame, text="Hủy", font=("Verdana", 14, "bold"), text_color="#7b7d7d", fg_color="white", border_color="#3084ee", border_width=1, hover_color="#d5ebf5", command=self.destroy).pack(side="left", padx=10, pady=5)
-        
+        ctk.CTkButton(button_frame, text="Hủy", font=("Verdana", 14, "bold"), text_color="#7b7d7d", fg_color="white",
+                      border_color="#3084ee", border_width=1, hover_color="#d5ebf5", command=self.destroy).pack(
+            side="left", padx=10, pady=5)
+
         self.save_button = ctk.CTkButton(button_frame, text="Lưu", font=("Verdana", 14, "bold"), command=self.xac_nhan)
         self.save_button.pack(side="right", padx=10, pady=5)
-        
+
     def center_window(self, width, height):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
         x = (screen_width - width) // 2
-        y = (screen_height - height) // 2 - 40 
+        y = (screen_height - height) // 2 - 40
         self.geometry(f"{width}x{height}+{x}+{y}")
 
     def create_input_row(self, label_text, entry_attr):
@@ -54,25 +57,26 @@ class UpdateLopHoc(ctk.CTkToplevel):
             entry = ttk.Combobox(frame, values=mon_list, state="readonly", width=45)
             entry.set("Chọn-")
 
-        else : 
+        else:
             if entry_attr == "hoc_ky_entry":
                 entry = ctk.CTkComboBox(frame, values=["1", "2", "3"], state="readonly", width=300)
                 entry.set("Chọn-")
-            else : 
+            else:
                 if entry_attr == "nam_entry":
                     entry = ctk.CTkComboBox(frame, values=self.get_recent_years(4), state="readonly", width=300)
                     entry.set("Chọn-")
 
-                else : entry = ctk.CTkEntry(frame, width=300)
+                else:
+                    entry = ctk.CTkEntry(frame, width=300)
 
         entry.pack(side="left", padx=10)
 
         setattr(self, entry_attr, entry)
-        
+
     def get_recent_years(self, n):
         current_year = datetime.now().year
         return [str(current_year + i) for i in range(n)]
-    
+
     def xac_nhan(self):
         ma_lop = self.ma_lop_entry.get().strip()
         ma_mon = self.ma_mon_entry.get().strip()
@@ -114,7 +118,7 @@ class UpdateLopHoc(ctk.CTkToplevel):
         self.so_luong_entry.insert(0, so_luong)
         self.hoc_ky_entry.set(str(hoc_ky))
         self.nam_entry.set(str(nam))
-                
+
         if not self.editable:
             self.no_edit()
 

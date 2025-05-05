@@ -24,14 +24,13 @@ class ChiTietDiemModels:
         """
         return self.db.execute_query(query, (ma_lop, mssv, ten_cot_diem), fetch_one=True)
 
-    def update(self, ma_lop, mssv, ten_cot_diem, diem):
+    def update(self, mssv, id_cot_diem, diem):
         query = """
         UPDATE chi_tiet_diem ctd
-        JOIN cau_hinh_diem chd ON ctd.id_cot_diem = chd.id
         SET ctd.diem = %s
-        WHERE ctd.ma_lop = %s AND ctd.mssv = %s AND chd.ten_cot_diem = %s
+        WHERE ctd.mssv = %s AND ctd.id_cot_diem = %s
         """
-        self.db.execute_query(query, (diem, ma_lop, mssv, ten_cot_diem))
+        self.db.execute_commit(query, (diem, mssv, id_cot_diem))
 
     def insert(self, ma_lop, mssv, ten_cot_diem, diem):
         # Lấy id_cot_diem từ tên cột điểm
@@ -46,11 +45,3 @@ class ChiTietDiemModels:
         VALUES (%s, %s, %s, %s)
         """
         self.db.execute_query(query, (ma_lop, mssv, id_cot_diem["id"], diem))
-
-    def update(self, id, mssv, id_cot_diem, diem):
-        query = """
-            UPDATE chi_tiet_diem 
-            SET mssv = %s, id_cot_diem = %s, diem = %s 
-            WHERE id = %s
-        """
-        return self.db.execute_commit(query, (mssv, id_cot_diem, diem, id))

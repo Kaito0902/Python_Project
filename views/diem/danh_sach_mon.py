@@ -74,14 +74,26 @@ class NhapDiemFrame(ctk.CTkFrame):
         self.load_data()
 
     def load_data(self):
-        data = self.controller.get_danh_sach_mon_va_so_luong_sv()
-        if data:
-            for row in self.tree.get_children():
-                self.tree.delete(row)
-            for row in data:
-                self.tree.insert('', 'end', values=row)
+        # Lấy danh sách môn học từ controller
+        danh_sach_mon = self.controller.get_danh_sach_mon_va_so_luong_sv()
+
+        # Xóa dữ liệu cũ
+        self.clear_treeview()
+
+        # Nạp dữ liệu mới
+        if danh_sach_mon:
+            for mon in danh_sach_mon:
+                self.tree.insert('', 'end', values=(
+                    mon['ma_mon'],
+                    mon['ten_mon'],
+                    mon['so_luong_sinh_vien']
+                ))
         else:
             messagebox.showinfo("Thông báo", "Không có dữ liệu để hiển thị.")
+
+    def clear_treeview(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
 
     def on_chon_nhap_diem(self):
         selected = self.tree.selection()

@@ -15,7 +15,6 @@ from controllers.mon_hoc_controller import MonHocController
 from views.crop_anh_view import CropperWindow
 
 
-
 class BangDiemLop(ctk.CTkFrame):
     def __init__(self, parent, ma_lop=None):
         super().__init__(parent, corner_radius=15, fg_color="white")
@@ -29,6 +28,8 @@ class BangDiemLop(ctk.CTkFrame):
 
         self.cot_co_dinh = ["MSSV", "Tên Sinh Viên", "Điểm Kiểm Tra"]
         self.cot_diem_list = []
+        self.id_cot_diem = []
+        self.ds = []
 
         header_frame = ctk.CTkFrame(self, fg_color="#646765", height=100)
         header_frame.pack(fill="x")
@@ -51,15 +52,33 @@ class BangDiemLop(ctk.CTkFrame):
             value_label.grid(row=0, column=2 * i + 1, padx=(0, 20), pady=2, sticky="w")
             self.info_labels.append((label, value_label))
 
-        self.upload_button = ctk.CTkButton(self.info_frame, text="Tải ảnh lên", command=self.upload_image)
-        self.upload_button.grid(row=0, column=6, padx=10, sticky="e")
-        self.export_button = ctk.CTkButton(self.info_frame, text="Xuất Excel", command=self.export_to_excel)
-        self.export_button.grid(row=0, column=7, padx=10, sticky="e")
+        button_width = 100
+        button_height = 30
+        button_font = ("Arial", 12)
+
+        self.upload_button = ctk.CTkButton(
+            self.info_frame, text="Tải ảnh lên", command=self.upload_image,
+            width=button_width, height=button_height, font=button_font
+        )
+        self.upload_button.grid(row=0, column=6, padx=5, pady=5, sticky="e")
+
+        self.export_button = ctk.CTkButton(
+            self.info_frame, text="Xuất Excel", command=self.export_to_excel,
+            width=button_width, height=button_height, font=button_font
+        )
+        self.export_button.grid(row=0, column=7, padx=5, pady=5, sticky="e")
+
+        self.edit_button = ctk.CTkButton(
+            self.info_frame, text="Sửa điểm", command=self.edit_selected_row,
+            width=button_width, height=button_height, font=button_font
+        )
+        self.edit_button.grid(row=0, column=8, padx=5, pady=5, sticky="e")
 
         # Treeview
         self.tree_frame = ctk.CTkFrame(self)
         self.tree_frame.pack(fill="both", expand=True)
         self.load_data()
+        self.tinh_diem_kiem_tra()
 
     def create_treeview(self):
 
@@ -115,7 +134,9 @@ class BangDiemLop(ctk.CTkFrame):
         # Lấy danh sách cột điểm theo cấu hình
         self.chdcontroller = CauHinhDiemController()
         ds_cot_diem = self.chdcontroller.select_all(self.ma_lop)
+        self.id_cot_diem = [[cot["id"]] for cot in ds_cot_diem]
         self.cot_diem_list = [(cot["ten_cot_diem"], cot["trong_so"]) for cot in ds_cot_diem]
+        self.ds = ds_cot_diem
 
         # Tạo lại bảng với các cột
         self.create_treeview()
@@ -286,8 +307,8 @@ class BangDiemLop(ctk.CTkFrame):
                 except ValueError:
                     messagebox.showerror("Lỗi", f"Điểm không hợp lệ cho MSSV {mssv}. Hãy kiểm tra lại.")
                     return
-
-                self.controller.update_or_insert(self.ma_lop, mssv, ten_cot_diem, diem)
+                id_cot_diem = next(item['id'] for item in self.ds if item['ten_cot_diem'] == ten_cot_diem)
+                self.controller.update(mssv, id_cot_diem, diem)
 
             popup.destroy()
             messagebox.showinfo("Thành công", "✅ Đã cập nhật điểm vào bảng điểm.")
@@ -368,5 +389,74 @@ class BangDiemLop(ctk.CTkFrame):
             os.startfile(file_path)  # Mở file Excel sau khi lưu
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể lưu file Excel:\n{str(e)}")
+
+    def edit_selected_row(self):
+        selected_item = self.tree.focus()
+        if not selected_item:
+            messagebox.showwarning("Chọn dòng", "Vui lòng chọn một sinh viên để sửa.")
+            return
+
+        values = self.tree.item(selected_item, "values")
+        if not values:
+            return
+
+        # Tạo popup sửa điểm
+        popup = ctk.CTkToplevel(self)
+        popup.title("Sửa điểm sinh viên")
+        popup.geometry("400x500")
+
+        # Hiển thị MSSV (không cho sửa)
+        ctk.CTkLabel(popup, text="MSSV").pack(anchor="w", padx=10, pady=2)
+        ctk.CTkLabel(popup, text=values[0]).pack(anchor="w", padx=10, pady=2)
+
+        # Hiển thị Họ tên (không cho sửa)
+        ctk.CTkLabel(popup, text="Họ tên").pack(anchor="w", padx=10, pady=2)
+        ctk.CTkLabel(popup, text=values[1]).pack(anchor="w", padx=10, pady=2)
+
+        entry_vars = []
+        for i, (ten_cot, _) in enumerate(self.cot_diem_list):
+            ctk.CTkLabel(popup, text=ten_cot).pack(anchor="w", padx=10, pady=2)
+            var = ctk.StringVar(value=values[i + 2])  # +2 vì MSSV và Họ tên đứng đầu
+            entry = ctk.CTkEntry(popup, textvariable=var)
+            entry.pack(fill="x", padx=10, pady=2)
+            entry_vars.append(var)
+
+        def save_edits():
+            mssv = values[0]
+            for i, var in enumerate(entry_vars):
+                diem_str = var.get()
+                try:
+                    diem = float(diem_str)
+                    if not (0 <= diem <= 10):
+                        raise ValueError  # Kiểm tra khoảng điểm
+                except ValueError:
+                    messagebox.showerror("Lỗi", f"Điểm không hợp lệ cho {self.cot_diem_list[i][0]}. Vui lòng nhập số từ 0 đến 10.")
+                    return  # Dừng lưu nếu có lỗi
+
+                id_cot_diem = self.id_cot_diem[i][0]
+                self.controller.update(mssv, id_cot_diem, diem)
+
+            self.load_data()
+            self.tinh_diem_kiem_tra()
+            popup.destroy()
+            messagebox.showinfo("Thành công", "Đã cập nhật điểm.")
+
+        save_btn = ctk.CTkButton(popup, text="Lưu", command=save_edits)
+        save_btn.pack(pady=10)
+
+    def tinh_diem_kiem_tra(self):
+        """Tính điểm kiểm tra (giả sử điểm thành phần luôn hợp lệ)."""
+        for item in self.tree.get_children():
+            values = self.tree.item(item, "values")
+            diem_thanh_phan = [float(x) for x in values[2:-1]]
+
+            tong_trong_so = sum(ts for _, ts in self.cot_diem_list)
+            if tong_trong_so == 0:
+                continue  # Tránh lỗi chia cho 0
+
+            diem_kiem_tra = sum(
+                diem * trong_so for diem, (_, trong_so) in zip(diem_thanh_phan, self.cot_diem_list)) / tong_trong_so
+            self.tree.set(item, column="Điểm Kiểm Tra", value=round(diem_kiem_tra, 2))
+
 
 

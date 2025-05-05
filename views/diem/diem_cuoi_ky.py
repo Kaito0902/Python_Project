@@ -102,9 +102,11 @@ class NhapDiemChiTietFrame(ctk.CTkFrame):
             command=self.upload_diem_cuoi_ky
         )
         self.btn_tai_anh.pack(side="left", padx=10)
+        self.load_data()
 
     def load_data(self):
         data = self.controller.get_diem_cuoi_ky_by_ma_mon(self.ma_lop)
+        print(data)
         if data:
             for row in self.tree.get_children():
                 self.tree.delete(row)

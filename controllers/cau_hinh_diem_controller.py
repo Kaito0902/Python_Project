@@ -34,3 +34,16 @@ class CauHinhDiemController:
         except Exception as e:
             print(f"Lỗi khi lấy danh sách cấu hình điểm: {e}")
             return []
+
+    def get_total_trong_so(self, ma_lop):
+        return self.model.get_total_trong_so(ma_lop)
+
+    def get_trong_so_by_id(self, id):
+        try:
+            return self.model.get_trong_so_by_id(id)
+        except Exception as e:
+            print(f"Lỗi khi lấy trọng số theo id: {e}")
+            return 0
+
+    def is_ten_cot_diem_exists(self, ma_lop, ten_cot_diem):
+        return self.model.is_ten_cot_diem_exists(ma_lop, ten_cot_diem)

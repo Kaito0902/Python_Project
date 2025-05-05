@@ -28,7 +28,7 @@ class LopMonHocFrame(ctk.CTkFrame):
             font=("Verdana", 18, "bold"),
             text_color="#ffffff"
         )
-        label_title.pack(pady=30, padx=20, anchor="w")  # Căn trái
+        label_title.pack(pady=30, padx=20, anchor="c")
 
         # Nút "Chọn nhập điểm" dưới tiêu đề
         button_frame = ctk.CTkFrame(content_frame, fg_color="white")
@@ -81,7 +81,11 @@ class LopMonHocFrame(ctk.CTkFrame):
             for row in self.tree.get_children():
                 self.tree.delete(row)
             for row in data:
-                self.tree.insert('', 'end', values=row)
+                self.tree.insert('', 'end', values=(
+                    row['ma_lop'],
+                    self.ma_mon,
+                    row['so_luong_sinh_vien']
+                ))
         else:
             messagebox.showinfo("Thông báo", "Không có dữ liệu để hiển thị.")
 

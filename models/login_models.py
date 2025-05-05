@@ -15,3 +15,14 @@ class LoginModels:
         if result:
             return result[0]  # Lấy dòng đầu tiên (vì username là duy nhất)
         return None
+
+    def lay_ma_nguoi_dung(self, username, password):
+        """
+        Lấy mã người dùng nếu đăng nhập thành công.
+        """
+        query = "SELECT ma_nguoi_dung FROM tai_khoan WHERE username = %s AND password = %s"
+        result = self.db.execute_query(query, (username, password))
+
+        if result:
+            return result[0]['ma_nguoi_dung']
+        return None

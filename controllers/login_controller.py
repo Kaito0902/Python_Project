@@ -27,3 +27,8 @@ class LoginController:
         Đăng xuất người dùng hiện tại (xóa current_user).
         """
         current_user.clear()
+
+    def lay_ma_nguoi_dung(self, username, password):
+
+        return self.login_model.dang_nhap(username, password)
+

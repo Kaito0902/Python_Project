@@ -60,7 +60,8 @@ class LoginView(ctk.CTk):
         password = self.entry_password.get()
 
         if self.login_controller.dang_nhap(username, password):
-            self.log_controller.ghi_nhat_ky(username, "Đăng nhập hệ thống")
+            ma_nguoi_dung = self.login_controller.lay_ma_nguoi_dung(username, password)
+            self.log_controller.ghi_nhat_ky(ma_nguoi_dung["ma_nguoi_dung"], "Đăng nhập hệ thống")
             self.after(100, lambda: [self.destroy(), self.on_login_success()])
         else:
             messagebox.showerror("Lỗi", "Sai tài khoản hoặc mật khẩu!")

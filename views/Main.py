@@ -56,33 +56,35 @@ class MainView(ctk.CTk):
         }
 
         if self.user_permissions.get("tai_khoan", {}).get("xem"):
-            ctk.CTkButton(self.menu_frame, text="Tài khoản", **button_style, command=self.show_account_frame).grid(row=1, column=0, pady=5)
+            ctk.CTkButton(self.menu_frame, text="Tài khoản", **button_style,
+                          command=self.show_account_frame).grid(row=1, column=0, pady=5)
 
+            # Nút Lớp học: tạo 1 nút, lệnh hiển thị khung lớp được quyết định theo vai trò
         if self.user_permissions.get("lop_hoc", {}).get("xem"):
-            ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classAdmin_frame).grid(row=2, column=0, pady=5)
-
-        # ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style, command=self.show_classGV_frame).grid(row=2, column=0, pady=5)
-        # ctk.CTkButton(self.menu_frame, text="Nhâp điểm cuối kỳ", **button_style, command=self.show_nhap_diem_frame).grid(row=2, column=0, pady=5)
+            ctk.CTkButton(self.menu_frame, text="Lớp học", **button_style,
+                          command=self.show_class_frame).grid(row=2, column=0, pady=5)
 
         if self.user_permissions.get("mon_hoc", {}).get("xem"):
-            ctk.CTkButton(self.menu_frame, text="Môn học", **button_style, command=self.show_subject_frame).grid(row=3, column=0, pady=5)
-
+            ctk.CTkButton(self.menu_frame, text="Môn học", **button_style,
+                          command=self.show_subject_frame).grid(row=3, column=0, pady=5)
         if self.user_permissions.get("giang_vien", {}).get("xem"):
-            ctk.CTkButton(self.menu_frame, text="Giảng viên", **button_style, command=self.show_teacher_frame).grid(row=4, column=0, pady=5)
-
+            ctk.CTkButton(self.menu_frame, text="Giảng viên", **button_style,
+                          command=self.show_teacher_frame).grid(row=4, column=0, pady=5)
         if self.user_permissions.get("sinh_vien", {}).get("xem"):
-            ctk.CTkButton(self.menu_frame, text="Sinh viên", **button_style, command=self.show_student_frame).grid(row=5, column=0, pady=5)
-
+            ctk.CTkButton(self.menu_frame, text="Sinh viên", **button_style,
+                          command=self.show_student_frame).grid(row=5, column=0, pady=5)
         if self.user_permissions.get("khoa", {}).get("xem"):
-            ctk.CTkButton(self.menu_frame, text="Khoa", **button_style, command=self.show_khoa_frame).grid(row=6, column=0, pady=5)
-
-        # ctk.CTkButton(self.menu_frame, text="Thống kê", **button_style).grid(row=7, column=0, pady=5)
+            ctk.CTkButton(self.menu_frame, text="Khoa", **button_style,
+                          command=self.show_khoa_frame).grid(row=6, column=0, pady=5)
 
         if current_user.get("vai_tro_id") == "admin":
-            ctk.CTkButton(self.menu_frame, text="Phân quyền", **button_style, command=self.show_permission_frame).grid(row=7, column=0, pady=5)
+            ctk.CTkButton(self.menu_frame, text="Phân quyền", **button_style,
+                          command=self.show_permission_frame).grid(row=7, column=0, pady=5)
 
         logout_btn = ctk.CTkButton(self.menu_frame, text="Đăng xuất", **button_style, command=self.destroy)
         logout_btn.grid(row=8, column=0, pady=5)
+        logout_btn.bind("<Enter>", lambda e: logout_btn.configure(fg_color="#e8473d"))
+        logout_btn.bind("<Leave>", lambda e: logout_btn.configure(fg_color="#98c2f7"))
 
         logout_btn.bind("<Enter>", lambda e: logout_btn.configure(fg_color="#e8473d"))
         logout_btn.bind("<Leave>", lambda e: logout_btn.configure(fg_color="#98c2f7"))
@@ -178,6 +180,21 @@ class MainView(ctk.CTk):
 
         nhap_diem_frame = NhapDiemFrame(self.main_content, app=self)
         nhap_diem_frame.pack(fill="both", expand=True)
+
+    def show_class_frame(self):
+        """
+        Hiển thị khung lớp học:
+         - Nếu vai trò đăng nhập là admin: sử dụng LopAdminFrame.
+         - Nếu không (có thể là giảng viên hoặc các vai trò khác): sử dụng LopGiangVienFrame.
+        """
+        for widget in self.main_content.winfo_children():
+            widget.destroy()
+        role = current_user.get("vai_tro_id")
+        if role == "giang_vien":
+            class_frame = LopGiangVienFrame(self.main_content, app=self)
+        else:
+            class_frame = LopAdminFrame(self.main_content, app=self)
+        class_frame.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
     import threading

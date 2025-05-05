@@ -115,3 +115,10 @@ class LopController:
             print(f"Lỗi khi phân công giảng viên: {e}")
             return False
 
+    def them(self):
+        try:
+            return self.lop_models.them()
+        except Exception as e:
+            print(f"Lỗi khi thêm: {e}")
+            return False
+

@@ -102,6 +102,7 @@ class DangKySinhVienVaoLopView(ctk.CTkToplevel):
                 continue 
             
             success = self.lop_controller.register_student_to_class(mssv, self.ma_lop)
+            self.lop_controller.them()
             if success:
                 registered_success.append(mssv)
 

@@ -101,7 +101,7 @@ class PermissionController:
     def is_role_used(self, ten_vai_tro):
         """
         Kiểm tra xem vai trò có đang được sử dụng bởi tài khoản nào không.
-        Giả sử bảng `nguoi_dung` có cột `vai_tro`.
+        Sử dụng bảng `tai_khoan` với cột `vai_tro`.
         """
         query = "SELECT * FROM tai_khoan WHERE vai_tro = %s"
         self.model.db.cursor.execute(query, (ten_vai_tro,))
@@ -117,3 +117,17 @@ class PermissionController:
         self.model.db.execute_commit(query_delete_permissions, (ten_vai_tro,))
         query_delete_role = "DELETE FROM vai_tro WHERE ten_vai_tro = %s"
         self.model.db.execute_commit(query_delete_role, (ten_vai_tro,))
+
+    def get_account_count_by_role(self, ten_vai_tro):
+        """
+        Lấy số lượng tài khoản có vai trò là ten_vai_tro từ bảng `tai_khoan`.
+        """
+        query = "SELECT COUNT(*) as count FROM tai_khoan WHERE vai_tro = %s"
+        self.model.db.cursor.execute(query, (ten_vai_tro,))
+        result = self.model.db.cursor.fetchone()
+        if result:
+            if isinstance(result, tuple):
+                return result[0]
+            else:
+                return result.get("count", 0)
+        return 0
