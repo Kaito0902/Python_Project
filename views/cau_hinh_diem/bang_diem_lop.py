@@ -12,6 +12,7 @@ from controllers.lop_controller import LopController
 from controllers.sinh_vien_controller import SinhVienController
 from controllers.cau_hinh_diem_controller import CauHinhDiemController
 from controllers.mon_hoc_controller import MonHocController
+from controllers.diem_controller import DiemController
 from views.crop_anh_view import CropperWindow
 
 
@@ -25,6 +26,7 @@ class BangDiemLop(ctk.CTkFrame):
         self.svcontroller = SinhVienController()
         self.chdcontroller = CauHinhDiemController()
         self.moncontroller = MonHocController()
+        self.diemcontroller = DiemController()
 
         self.cot_co_dinh = ["MSSV", "Tên Sinh Viên", "Điểm Kiểm Tra"]
         self.cot_diem_list = []
@@ -448,15 +450,29 @@ class BangDiemLop(ctk.CTkFrame):
         """Tính điểm kiểm tra (giả sử điểm thành phần luôn hợp lệ)."""
         for item in self.tree.get_children():
             values = self.tree.item(item, "values")
-            diem_thanh_phan = [float(x) for x in values[2:-1]]
+            mssv = values[0]  # Lấy MSSV của sinh viên
+            diem_thanh_phan = []
+            try:
+                for x in values[2:-1]:
+                    if x != "":  # Kiểm tra ô điểm không rỗng
+                        diem_thanh_phan.append(float(x))
+                    else:
+                        diem_thanh_phan.append(0.0)  # Xử lý khi ô điểm rỗng
 
-            tong_trong_so = sum(ts for _, ts in self.cot_diem_list)
-            if tong_trong_so == 0:
-                continue  # Tránh lỗi chia cho 0
+                tong_trong_so = sum(ts for _, ts in self.cot_diem_list)
+                if tong_trong_so == 0:
+                    diem_kiem_tra = 0  # Xử lý khi tổng trọng số bằng 0
+                else:
+                    diem_kiem_tra = sum(
+                        diem * trong_so for diem, (_, trong_so) in
+                        zip(diem_thanh_phan, self.cot_diem_list)) / tong_trong_so
 
-            diem_kiem_tra = sum(
-                diem * trong_so for diem, (_, trong_so) in zip(diem_thanh_phan, self.cot_diem_list)) / tong_trong_so
-            self.tree.set(item, column="Điểm Kiểm Tra", value=round(diem_kiem_tra, 2))
+                self.tree.set(item, column="Điểm Kiểm Tra", value=round(diem_kiem_tra, 2))
+                self.diemcontroller.insert_diem_kiem_tra(mssv, self.ma_lop,
+                                                         diem_kiem_tra)  # Update điểm kiểm tra sau khi tính
+
+            except ValueError:  # Xử lý lỗi khi điểm không phải là số
+                messagebox.showerror("Lỗi", "Điểm thành phần không hợp lệ. Vui lòng nhập số.")
 
 
 

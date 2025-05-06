@@ -22,7 +22,7 @@ class DiemController:
         try:
             return self.diem_models.update_diem_cuoi_ky(mssv, ma_lop, diem_cuoi_ky)
         except Exception as e:
-            print(f"Lỗi khi cập nhật điểm: {e}")
+            print(f"Lỗi khi cập nhật điểm cuối kỳ: {e}")
             return False
 
     def get_danh_sach_mon_va_so_luong_sv(self):
@@ -45,3 +45,10 @@ class DiemController:
         except Exception as e:
             print(f"Lỗi khi lấy danh sách lớp và số lượng sinh viên: {e}")
             return []
+
+    def insert_diem_kiem_tra(self, mssv, ma_lop, diem_kiem_tra):
+        try:
+            return self.insert_diem_kiem_tra(mssv, ma_lop, diem_kiem_tra)
+        except Exception as e:
+            print(f"Lỗi khi cập nhật điểm kiểm tra: {e}")
+            return False

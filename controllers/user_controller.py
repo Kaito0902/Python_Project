@@ -1,13 +1,14 @@
 from models.permission_models import PermissionModel  # 🔥 Import model
 
+
 class UserController:
     def __init__(self):
         self.model = PermissionModel()  # 🔥 Khởi tạo model
-        print("✅ UserController đã khởi tạo & kết nối database!")  
+        print("✅ UserController đã khởi tạo & kết nối database!")
 
     def get_module_permissions(self, username, module):
         """Lấy quyền của user trên một module cụ thể."""
-        
+
         # 🔥 Kiểm tra kết nối database trước khi truy vấn
         if not self.model.db:
             print("❌ Lỗi: Database chưa được khởi tạo!")
@@ -19,7 +20,7 @@ class UserController:
             INNER JOIN tai_khoan u ON q.vai_tro = u.vai_tro
             WHERE u.username = %s AND q.module = %s
         """
-        
+
         try:
             result = self.model.db.fetch_one(query, (username, module))
 
@@ -40,7 +41,8 @@ class UserController:
         except Exception as e:
             print(f"❌ Lỗi khi truy vấn SQL: {e}")
             return {"xem": 0, "them": 0, "sua": 0, "xoa": 0}  # 🔥 Tránh lỗi khi truy vấn SQL
-    
+
+
 # 🚀 Test nhanh
 if __name__ == "__main__":
     controller = UserController()

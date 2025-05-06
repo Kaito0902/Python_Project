@@ -3,7 +3,8 @@ import customtkinter as ctk
 from PIL import Image
 from tkinter import messagebox
 from tkinter import ttk
-
+from session import current_user, current_user_permissions
+from controllers.AuthManager import lay_quyen
 from controllers.lop_controller import LopController
     
 class LopGiangVienFrame(ctk.CTkFrame):
@@ -12,6 +13,7 @@ class LopGiangVienFrame(ctk.CTkFrame):
         self.configure(fg_color="#ffffff")
         self.app = app
         self.lop_controller = LopController()
+        self.user_permissions = current_user["ma_nguoi_dung"]
 
         content_frame = ctk.CTkFrame(self, fg_color="#ffffff", width=824, height=600)
         content_frame.pack(side="top", fill="both", expand=True)
@@ -89,11 +91,16 @@ class LopGiangVienFrame(ctk.CTkFrame):
 
     def update_treeview(self, data=None):
         self.tree.delete(*self.tree.get_children())
-        classes  = data if data is not None else self.lop_controller.select_all()
-        if not classes:
-            messagebox.showinfo("Thông báo", "Không có dữ liệu lớp học!")
+        classes = data if data is not None else self.lop_controller.select_all()
+
+        # Lọc danh sách lớp theo mã giảng viên
+        filtered_classes = [lop for lop in classes if lop["ma_gv"] == str(self.user_permissions)]
+
+        if not filtered_classes:
+            messagebox.showinfo("Thông báo", "Không có dữ liệu lớp học phù hợp!")
             return
-        for lop in classes :
+
+        for lop in filtered_classes:
             self.tree.insert("", "end", values=(
                 lop["ma_lop"], lop["ma_mon"], lop["so_luong"], lop["hoc_ky"], lop["nam"], lop["ma_gv"]
             ))

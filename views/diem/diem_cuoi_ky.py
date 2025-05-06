@@ -41,14 +41,41 @@ class NhapDiemChiTietFrame(ctk.CTkFrame):
         info_frame = ctk.CTkFrame(content_frame, fg_color="white")
         info_frame.pack(fill="x", padx=20, pady=10)
 
-        self.label_mon = ctk.CTkLabel(info_frame, text="Môn: ", font=("Verdana", 13))
-        self.label_mon.pack(side="left", padx=10)
+        self.label_mon = ctk.CTkLabel(info_frame, text=f"Môn: {self.ten_mon}", font=("Verdana", 13))
+        self.label_mon.grid(row=0, column=0, sticky="w", padx=10)
 
-        self.label_so_luong = ctk.CTkLabel(info_frame, text="Số lượng: ", font=("Verdana", 13))
-        self.label_so_luong.pack(side="left", padx=30)
+        self.label_so_luong = ctk.CTkLabel(info_frame, text=f"Số lượng: {self.so_luong}", font=("Verdana", 13))
+        self.label_so_luong.grid(row=0, column=1, sticky="w", padx=30)
 
-        self.label_mon.configure(text=f"Môn: {self.ten_mon}")
-        self.label_so_luong.configure(text=f"Số lượng: {self.so_luong}")
+        self.btn_xuat_excel = ctk.CTkButton(
+            info_frame,  # Place buttons in info_frame
+            text="Xuất Excel",
+            fg_color="#4CAF50",
+            text_color="white",
+            font=("Verdana", 12, "bold"),
+            command=self.export_excel
+        )
+        self.btn_xuat_excel.grid(row=0, column=2, padx=10)
+
+        self.btn_tai_anh = ctk.CTkButton(
+            info_frame,  # Place buttons in info_frame
+            text="Tải ảnh lên",
+            fg_color="#904fd2",
+            text_color="white",
+            font=("Verdana", 12, "bold"),
+            command=self.upload_diem_cuoi_ky
+        )
+        self.btn_tai_anh.grid(row=0, column=3, padx=10)
+
+        self.btn_sua = ctk.CTkButton(
+            info_frame,  # Place buttons in info_frame
+            text="Sửa",
+            fg_color="#FFA500",  # Orange color
+            text_color="white",
+            font=("Verdana", 12, "bold"),
+            command=self.edit_diem  # Add edit functionality later
+        )
+        self.btn_sua.grid(row=0, column=4, padx=10)
 
         # Bảng điểm sinh viên
         tree_frame = ctk.CTkFrame(content_frame, fg_color="white")
@@ -79,29 +106,6 @@ class NhapDiemChiTietFrame(ctk.CTkFrame):
 
         self.tree.pack(fill="both", expand=True)
 
-        # Các nút chức năng
-        button_frame = ctk.CTkFrame(content_frame, fg_color="white")
-        button_frame.pack(pady=10)
-
-        self.btn_xuat_excel = ctk.CTkButton(
-            button_frame,
-            text="Xuất Excel",
-            fg_color="#4CAF50",
-            text_color="white",
-            font=("Verdana", 12, "bold"),
-            command=self.export_excel
-        )
-        self.btn_xuat_excel.pack(side="left", padx=10)
-
-        self.btn_tai_anh = ctk.CTkButton(
-            button_frame,
-            text="Tải ảnh lên",
-            fg_color="#904fd2",
-            text_color="white",
-            font=("Verdana", 12, "bold"),
-            command=self.upload_diem_cuoi_ky
-        )
-        self.btn_tai_anh.pack(side="left", padx=10)
         self.load_data()
 
     def load_data(self):
@@ -110,8 +114,11 @@ class NhapDiemChiTietFrame(ctk.CTkFrame):
         if data:
             for row in self.tree.get_children():
                 self.tree.delete(row)
-            for row in data:
-                self.tree.insert('', 'end', values=row)
+            for sv in data:
+                mssv = sv.get("mssv", "")
+                ho_ten = sv.get("ho_ten", "")
+                diem = sv.get("diem_cuoi_ky", "") if sv.get("diem_cuoi_ky") is not None else ""
+                self.tree.insert('', 'end', values=(mssv, ho_ten, diem))
         else:
             messagebox.showinfo("Thông báo", "Không có dữ liệu để hiển thị.")
 
@@ -215,6 +222,7 @@ class NhapDiemChiTietFrame(ctk.CTkFrame):
         processor = ImageProcessor(image, recognizer)
         processor.extract_and_recognize()
         result_kq = processor.result_kq  # [(mssv, diem), ...]
+        print(result_kq)
 
         self.show_edit_popup(result_kq, ten_cot_diem)
 
@@ -305,6 +313,59 @@ class NhapDiemChiTietFrame(ctk.CTkFrame):
 
         save_btn = ctk.CTkButton(popup, text="Lưu dữ liệu vào bảng điểm", command=save_data)
         save_btn.pack(pady=10)
+
+    def edit_diem(self):
+        selected_item = self.tree.focus()
+        if not selected_item:
+            messagebox.showwarning("Chọn dòng", "Vui lòng chọn một sinh viên để sửa.")
+            return
+
+        values = self.tree.item(selected_item, "values")
+        if not values:
+            return
+
+        # Tạo popup sửa điểm
+        popup = ctk.CTkToplevel(self)
+        popup.title("Sửa điểm cuối kỳ")  # Changed title
+        popup.geometry("400x400")  # Smaller size
+
+        # Hiển thị MSSV (không cho sửa)
+        ctk.CTkLabel(popup, text="MSSV").pack(anchor="w", padx=10, pady=5)
+        ctk.CTkLabel(popup, text=values[0]).pack(anchor="w", padx=10, pady=5)
+
+        # Hiển thị Họ tên (không cho sửa)
+        ctk.CTkLabel(popup, text="Họ tên").pack(anchor="w", padx=10, pady=5)
+        ctk.CTkLabel(popup, text=values[1]).pack(anchor="w", padx=10, pady=5)
+
+        # Điểm cuối kỳ (cho sửa)
+        ctk.CTkLabel(popup, text="Điểm cuối kỳ").pack(anchor="w", padx=10, pady=5)
+        diem_var = ctk.StringVar(value=values[2] if values[2] != "" else "0")  # Default to 0 if empty
+
+        entry_diem = ctk.CTkEntry(popup, textvariable=diem_var)
+        entry_diem.pack(fill="x", padx=10, pady=5)
+
+        def save_edits():
+            mssv = values[0]
+            diem_str = diem_var.get()
+
+            try:
+                diem = float(diem_str)
+                if not (0 <= diem <= 10):
+                    raise ValueError  # Kiểm tra khoảng điểm
+            except ValueError:
+                messagebox.showerror("Lỗi", "Điểm không hợp lệ. Vui lòng nhập số từ 0 đến 10.")
+                return  # Dừng lưu nếu có lỗi
+
+            self.controller.update(mssv, self.ma_lop, diem)  # Corrected controller function name
+
+            self.load_data()  # Refresh the treeview
+            popup.destroy()
+            messagebox.showinfo("Thành công", "Đã cập nhật điểm.")
+
+        save_btn = ctk.CTkButton(popup, text="Lưu", command=save_edits)
+        save_btn.pack(pady=10)
+
+
 
 
 

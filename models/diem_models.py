@@ -5,7 +5,13 @@ class DiemModels:
         self.db = Database()
 
     def select_all(self):
-        query = "SELECT * FROM diem"
+        query = """
+            SELECT d.mssv, sv.ho_ten, mh.ten_mon, d.diem_kiem_tra, d.diem_cuoi_ky, d.diem_tong_ket, d.xep_loai
+            FROM diem d
+            JOIN sinh_vien sv ON d.mssv = sv.mssv
+            JOIN lop l ON d.ma_lop = l.ma_lop
+            JOIN mon_hoc mh ON l.ma_mon = mh.ma_mon
+        """
         return self.db.execute_query(query)
 
     def select_by_mssv(self, mssv):
@@ -43,7 +49,7 @@ class DiemModels:
 
     def get_danh_sach_sv_theo_ma_lop(self, ma_lop):
         query = """
-            SELECT sv.mssv, sv.ho_ten
+            SELECT sv.mssv, sv.ho_ten, d.diem_cuoi_ky
             FROM diem d
             JOIN sinh_vien sv ON d.mssv = sv.mssv
             WHERE d.ma_lop = %s
@@ -71,3 +77,11 @@ class DiemModels:
             GROUP BY l.ma_mon, m.ten_mon
         """
         return self.db.execute_query(query, (hoc_ky, current_year))
+
+    def insert_diem_cuoi_ky(self, mssv, ma_lop, diem_kiem_tra):
+        query = """
+                    UPDATE diem
+                    SET diem_kiem_tra = %s
+                    WHERE mssv = %s AND ma_lop = %s
+                """
+        return self.db.execute_commit(query, (diem_kiem_tra, mssv, ma_lop))

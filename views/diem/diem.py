@@ -2,12 +2,14 @@ import tkinter as ttk
 import customtkinter as ctk
 from tkinter import ttk
 from tkinter import messagebox
+from controllers.diem_controller import DiemController
 
 class TraCuuDiemFrame(ctk.CTkFrame):
     def __init__(self, master=None, app=None, **kwargs):
         super().__init__(master, **kwargs)
         self.configure(fg_color="#ffffff")
         self.app = app
+        self.controller = DiemController()
 
         content_frame = ctk.CTkFrame(self, fg_color="#ffffff")
         content_frame.pack(fill="both", expand=True)
@@ -60,22 +62,43 @@ class TraCuuDiemFrame(ctk.CTkFrame):
                   foreground=[("selected", "white")])
 
         self.tree = ttk.Treeview(tree_frame,
-                                 columns=("mssv", "hoten", "kt", "cuoiky", "xeploai"),
+                                 columns=("mssv", "hoten", "tenmon", "kt", "cuoiky", "xeploai"),
                                  show="headings",
                                  style="Treeview")
+
         self.tree.heading("mssv", text="MSSV")
         self.tree.heading("hoten", text="Họ tên")
+        self.tree.heading("tenmon", text="Tên môn")
         self.tree.heading("kt", text="Điểm kiểm tra")
         self.tree.heading("cuoiky", text="Điểm cuối kỳ")
         self.tree.heading("xeploai", text="Xếp loại")
 
         self.tree.column("mssv", width=100, anchor="center")
         self.tree.column("hoten", width=180, anchor="center")
+        self.tree.column("tenmon", width=160, anchor="center")
         self.tree.column("kt", width=120, anchor="center")
         self.tree.column("cuoiky", width=120, anchor="center")
         self.tree.column("xeploai", width=120, anchor="center")
 
         self.tree.pack(fill="both", expand=True)
+        self.load_data()
+
+    def load_data(self):
+        data = self.controller.select_all()
+        if data:
+            for row in self.tree.get_children():
+                self.tree.delete(row)
+            for sv in data:
+                mssv = sv.get("mssv", "")
+                ho_ten = sv.get("ho_ten", "")
+                ten_mon = sv.get("ten_mon", "")
+                diem_kt = sv.get("diem_kiem_tra", "")
+                diem_cuoiky = sv.get("diem_cuoi_ky", "")
+                xep_loai = sv.get("xep_loai", "")
+
+                self.tree.insert('', 'end', values=(mssv, ho_ten, ten_mon, diem_kt, diem_cuoiky, xep_loai))
+        else:
+            messagebox.showinfo("Thông báo", "Không có dữ liệu để hiển thị.")
 
     def on_search(self):
         keyword = self.search_entry.get().strip()

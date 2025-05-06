@@ -1,6 +1,7 @@
-
 import mysql.connector
 import logging
+
+
 class Database:
     def __init__(self):
         self.conn = None
@@ -47,7 +48,6 @@ class Database:
             if cursor:
                 cursor.close()
 
-
     def execute_commit(self, query, params=None):
         conn = self.conn or self.connect()  # Dùng kết nối hiện có hoặc tạo mới
         if not conn:
@@ -72,7 +72,7 @@ class Database:
         if not conn:
             print("❌ Chưa kết nối đến database!")
             return []
-        
+
         try:
             cursor = conn.cursor(dictionary=True)  # Đảm bảo dữ liệu trả về dạng dictionary
             cursor.execute(query, params or ())
@@ -102,10 +102,9 @@ class Database:
             return None
         finally:
             if self.cursor:
-                self.cursor.close() 
-        
+                self.cursor.close()
+
     def close(self):
         if self.conn:
             self.conn.close()
             print("✅ Đã đóng kết nối database!")
-

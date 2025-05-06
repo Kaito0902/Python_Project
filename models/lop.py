@@ -92,8 +92,16 @@ class LopModels:
         return bool(result)
 
     def register_student_to_class(self, mssv, ma_lop):
-        query = "INSERT INTO dang_ky (mssv, ma_lop) VALUES (%s, %s)"
-        return self.db.execute_commit(query, (mssv, ma_lop))
+        # Thêm vào bảng dang_ky
+        query_dk = "INSERT INTO dang_ky (mssv, ma_lop) VALUES (%s, %s)"
+        success = self.db.execute_commit(query_dk, (mssv, ma_lop))
+
+        # Nếu đăng ký thành công thì thêm dòng trống vào bảng diem
+        if success:
+            query_diem = "INSERT INTO diem (mssv, ma_lop) VALUES (%s, %s)"
+            self.db.execute_commit(query_diem, (mssv, ma_lop))
+
+        return success
 
     def them(self):
         query_them = """
@@ -110,10 +118,19 @@ class LopModels:
         return self.db.execute_commit(query_them)
 
     def huy_dang_ky(self, mssv, ma_lop):
-        query = "DELETE FROM dang_ky WHERE mssv = %s AND ma_lop = %s"
-        query_delete_diem = "DELETE FROM chi_tiet_diem WHERE mssv = %s"
-        self.db.execute_commit(query_delete_diem, (mssv,))
-        return self.db.execute_commit(query, (mssv, ma_lop))
+        # Xóa chi tiết điểm (phụ thuộc vào mssv và lớp)
+        query_delete_chi_tiet = "DELETE FROM chi_tiet_diem WHERE mssv = %s"
+
+        # Xóa điểm tổng kết
+        query_delete_diem = "DELETE FROM diem WHERE mssv = %s AND ma_lop = %s"
+
+        # Xóa đăng ký lớp
+        query_dk = "DELETE FROM dang_ky WHERE mssv = %s AND ma_lop = %s"
+
+        # Thực hiện theo thứ tự: chi_tiet_diem -> diem -> dang_ky
+        self.db.execute_commit(query_delete_chi_tiet, (mssv, ma_lop))
+        self.db.execute_commit(query_delete_diem, (mssv, ma_lop))
+        return self.db.execute_commit(query_dk, (mssv, ma_lop))
 
     def danh_sach_gv_theo_khoa(self, ma_lop):
         query = """

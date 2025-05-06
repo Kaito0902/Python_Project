@@ -15,6 +15,7 @@ from views.cau_hinh_diem.QuanLyLopTabbedPane import QuanLyLopTabbedPane
 from views.account_view import AccountManager
 from views.permission_view import PermissionView
 from views.diem.danh_sach_mon import NhapDiemFrame
+from views.diem.diem import TraCuuDiemFrame
 from session import current_user
 from controllers.AuthManager import lay_quyen
 from login_view import LoginView
@@ -24,9 +25,9 @@ class MainView(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Trang chủ")
-        self.geometry("1024x600")
+        self.geometry("1024x700")
         self.configure(fg_color="#ffffff")
-        self.center_window(1024, 600)
+        self.center_window(1024, 700)
         
         self.selected_ma_lop = None
 
@@ -81,8 +82,14 @@ class MainView(ctk.CTk):
             ctk.CTkButton(self.menu_frame, text="Phân quyền", **button_style,
                           command=self.show_permission_frame).grid(row=7, column=0, pady=5)
 
+        ctk.CTkButton(self.menu_frame, text="Nhập điểm ck", **button_style,
+                          command=self.show_nhap_diem_frame).grid(row=8, column=0, pady=5)
+
+        ctk.CTkButton(self.menu_frame, text="Tra cứu", **button_style,
+                      command=self.show_tra_cuu_diem_frame).grid(row=9, column=0, pady=5)
+
         logout_btn = ctk.CTkButton(self.menu_frame, text="Đăng xuất", **button_style, command=self.destroy)
-        logout_btn.grid(row=8, column=0, pady=5)
+        logout_btn.grid(row=10, column=0, pady=5)
         logout_btn.bind("<Enter>", lambda e: logout_btn.configure(fg_color="#e8473d"))
         logout_btn.bind("<Leave>", lambda e: logout_btn.configure(fg_color="#98c2f7"))
 
@@ -195,6 +202,13 @@ class MainView(ctk.CTk):
         else:
             class_frame = LopAdminFrame(self.main_content, app=self)
         class_frame.pack(fill="both", expand=True)
+
+    def show_tra_cuu_diem_frame(self):
+        for widget in self.main_content.winfo_children():
+            widget.destroy()
+
+        tra_cuu_diem_frame = TraCuuDiemFrame(self.main_content, app=self)
+        tra_cuu_diem_frame.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
     import threading
